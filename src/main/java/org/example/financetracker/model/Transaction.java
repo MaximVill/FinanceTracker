@@ -11,6 +11,12 @@ public class Transaction {
     private LocalDate transaction_date;
     private Long category_id;
 
+    @Override
+    public String toString() {
+        return String.format("Transaction{id=%s, title='%s', type='%s', amount=%s %s, date=%s}",
+                id, title, category_id, amount, currency, transaction_date);
+    }
+
     // == ГЕТТЕРЫ ==
     public Long getId() {return id;}
     public String getTitle() {return title;}

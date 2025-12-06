@@ -3,10 +3,7 @@ package org.example.financetracker.db;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class DatabaseManager {
     private static final Logger logger = LoggerFactory.getLogger(DatabaseManager.class);
@@ -67,12 +64,23 @@ public class DatabaseManager {
             )
             """;
 
-        try (PreparedStatement ps1 = connection.prepareStatement(createTransactions);
-             PreparedStatement ps2 = connection.prepareStatement(createCategories);
-             PreparedStatement ps3 = connection.prepareStatement(createExchangeRates)) {
-            ps1.execute();
-            ps2.execute();
-            ps3.execute();
+        String createSettings = """
+                CREATE TABLE IF NOT EXISTS app_settings (
+                      id INT PRIMARY KEY,
+                      main_currency VARCHAR(3) NOT NULL DEFAULT 'RUB'
+                  );
+            """;
+
+        try (Connection conn = DataSource.getConnection();
+             Statement stmt = conn.createStatement()) {
+
+            stmt.execute(createTransactions);
+            stmt.execute(createCategories);
+            stmt.execute(createExchangeRates);
+            stmt.execute(createSettings);
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to initialize database", e);
         }
     }
 
