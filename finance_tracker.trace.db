@@ -1,0 +1,48 @@
+2025-12-06 22:05:15.790295+07:00 database: wrong user or password; user: ""
+org.h2.message.DbException: Неверное имя пользователя или пароль
+Wrong user name or password [28000-240]
+	at com.h2database@2.4.240/org.h2.message.DbException.get(DbException.java:223)
+	at com.h2database@2.4.240/org.h2.message.DbException.get(DbException.java:199)
+	at com.h2database@2.4.240/org.h2.message.DbException.get(DbException.java:188)
+	at com.h2database@2.4.240/org.h2.engine.Engine.openSession(Engine.java:154)
+	at com.h2database@2.4.240/org.h2.engine.Engine.openSession(Engine.java:222)
+	at com.h2database@2.4.240/org.h2.engine.Engine.createSession(Engine.java:201)
+	at com.h2database@2.4.240/org.h2.engine.SessionRemote.connectEmbeddedOrServer(SessionRemote.java:350)
+	at com.h2database@2.4.240/org.h2.jdbc.JdbcConnection.<init>(JdbcConnection.java:124)
+	at com.h2database@2.4.240/org.h2.Driver.connect(Driver.java:59)
+	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:683)
+	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:230)
+	at org.example.financetracker/org.example.financetracker.db.DataSource.getConnection(DataSource.java:21)
+	at org.example.financetracker/org.example.financetracker.db.DatabaseManager.createTables(DatabaseManager.java:74)
+	at org.example.financetracker/org.example.financetracker.db.DatabaseManager.initializeDatabase(DatabaseManager.java:25)
+	at org.example.financetracker/org.example.financetracker.HelloApplication.start(HelloApplication.java:14)
+	at javafx.graphics@21.0.6/com.sun.javafx.application.LauncherImpl.lambda$launchApplication1$9(LauncherImpl.java:839)
+	at javafx.graphics@21.0.6/com.sun.javafx.application.PlatformImpl.lambda$runAndWait$12(PlatformImpl.java:483)
+	at javafx.graphics@21.0.6/com.sun.javafx.application.PlatformImpl.lambda$runLater$10(PlatformImpl.java:456)
+	at java.base/java.security.AccessController.doPrivileged(AccessController.java:400)
+	at javafx.graphics@21.0.6/com.sun.javafx.application.PlatformImpl.lambda$runLater$11(PlatformImpl.java:455)
+	at javafx.graphics@21.0.6/com.sun.glass.ui.InvokeLaterDispatcher$Future.run(InvokeLaterDispatcher.java:95)
+	at javafx.graphics@21.0.6/com.sun.glass.ui.win.WinApplication._runLoop(Native Method)
+	at javafx.graphics@21.0.6/com.sun.glass.ui.win.WinApplication.lambda$runLoop$3(WinApplication.java:185)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+Caused by: org.h2.jdbc.JdbcSQLInvalidAuthorizationSpecException: Неверное имя пользователя или пароль
+Wrong user name or password [28000-240]
+	at com.h2database@2.4.240/org.h2.message.DbException.getJdbcSQLException(DbException.java:522)
+	at com.h2database@2.4.240/org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
+	... 24 more
+2025-12-06 22:05:47.451732+07:00 jdbc[4]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Синтаксическая ошибка в выражении SQL "CREATE TABLE IF NOT EXISTS app_settings (\000a    id INT PRIMARY KEY [*]DEFAULT 1,\000a    main_currency VARCHAR(3) NOT NULL DEFAULT 'RUB'\000a);\000a"; ожидалось "HASH, CONSTRAINT, COMMENT, UNIQUE, NOT NULL, CHECK, REFERENCES, ,, )"
+Syntax error in SQL statement "CREATE TABLE IF NOT EXISTS app_settings (\000a    id INT PRIMARY KEY [*]DEFAULT 1,\000a    main_currency VARCHAR(3) NOT NULL DEFAULT 'RUB'\000a);\000a"; expected "HASH, CONSTRAINT, COMMENT, UNIQUE, NOT NULL, CHECK, REFERENCES, ,, )"; SQL statement:
+CREATE TABLE IF NOT EXISTS app_settings (
+    id INT PRIMARY KEY DEFAULT 1,
+    main_currency VARCHAR(3) NOT NULL DEFAULT 'RUB'
+);
+ [42001-240]
+2025-12-06 22:06:10.677718+07:00 jdbc[4]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Синтаксическая ошибка в выражении SQL "CREATE TABLE IF NOT EXISTS app_settings (\000a    id INT PRIMARY KEY [*]DEFAULT 1,\000a    main_currency VARCHAR(3) NOT NULL DEFAULT 'RUB'\000a);\000a"; ожидалось "HASH, CONSTRAINT, COMMENT, UNIQUE, NOT NULL, CHECK, REFERENCES, ,, )"
+Syntax error in SQL statement "CREATE TABLE IF NOT EXISTS app_settings (\000a    id INT PRIMARY KEY [*]DEFAULT 1,\000a    main_currency VARCHAR(3) NOT NULL DEFAULT 'RUB'\000a);\000a"; expected "HASH, CONSTRAINT, COMMENT, UNIQUE, NOT NULL, CHECK, REFERENCES, ,, )"; SQL statement:
+CREATE TABLE IF NOT EXISTS app_settings (
+    id INT PRIMARY KEY DEFAULT 1,
+    main_currency VARCHAR(3) NOT NULL DEFAULT 'RUB'
+);
+ [42001-240]
