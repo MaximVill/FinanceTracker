@@ -10,6 +10,7 @@ public class Transaction {
     private String currency; // RUB, USD, EUR
     private LocalDate transaction_date;
     private Long category_id;
+    private Category category;
 
     @Override
     public String toString() {
@@ -24,6 +25,7 @@ public class Transaction {
     public String getCurrency() {return currency;}
     public LocalDate getTransaction_date() {return transaction_date;}
     public Long getCategory_id() {return category_id;}
+    public Category getCategory() {return category;}
 
     // == СЕТТЕРЫ ==
     public void setId(Long id) {this.id = id;}
@@ -32,4 +34,5 @@ public class Transaction {
     public void setCurrency(String currency) {this.currency = currency;}
     public void setTransaction_date(LocalDate transaction_date) {this.transaction_date = transaction_date;}
     public void setCategory_id(Long category_id) {this.category_id = category_id;}
+    public void setCategory(Category category) {this.category = category;}
 }
