@@ -26,13 +26,15 @@ public class SettingsDAO {
                     insert.executeUpdate();
                 }
                 return "RUB";
+            } else {
+                // Есть запись - возвращаем валюту
+                return rs.getString("main_currency");  // ← ВОТ ЗДЕСЬ ИСПРАВЛЕНИЕ!
             }
 
         } catch (SQLException e) {
             log.error("Ошибка при чтении настроек", e);
             throw new RuntimeException("Failed to read settings", e);
         }
-        return sql;
     }
 
     // Сохранить основную валюту

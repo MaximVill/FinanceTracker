@@ -1,5 +1,6 @@
 package org.example.financetracker.db;
 
+import org.example.financetracker.model.Category;
 import org.example.financetracker.model.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,7 +59,12 @@ public class TransactionDAO {
     // 3. Получение всех транзакций
     public List<Transaction> findAll() {
         List<Transaction> transactions = new ArrayList<>();
-        String sql = "SELECT id, title, amount, currency, transaction_date, category_id FROM transactions ORDER BY transaction_date DESC";
+        String sql = """
+            SELECT t.*, c.name as category_name, c.type as category_type
+            FROM transactions t
+            LEFT JOIN categories c ON t.category_id = c.id
+            ORDER BY t.transaction_date DESC
+            """;
 
         try (Connection conn = DataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
@@ -72,6 +78,16 @@ public class TransactionDAO {
                 t.setCurrency(rs.getString("currency"));
                 t.setTransaction_date(rs.getDate("transaction_date").toLocalDate());
                 t.setCategory_id(rs.getLong("category_id"));
+
+                // Если есть категория, создаем объект
+                if (rs.getLong("category_id") > 0) {
+                    Category cat = new Category();
+                    cat.setId(rs.getLong("category_id"));
+                    cat.setName(rs.getString("category_name"));
+                    cat.setType(rs.getString("category_type"));
+                    t.setCategory(cat); // Используем новый сеттер
+                }
+
                 transactions.add(t);
             }
 
