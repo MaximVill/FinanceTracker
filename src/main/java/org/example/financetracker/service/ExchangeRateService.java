@@ -2,18 +2,30 @@ package org.example.financetracker.service;
 
 import org.example.financetracker.db.ExchangeRateDAO;
 import org.example.financetracker.model.ExchangeRate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
+
+
+
 
 public class ExchangeRateService {
     private final ExchangeRateDAO exchangeRateDAO;
+    private static final Logger log = LoggerFactory.getLogger(ExchangeRateService.class);
 
     public ExchangeRateService(ExchangeRateDAO exchangeRateDAO) {
         this.exchangeRateDAO = exchangeRateDAO;
+    }
+
+    public ExchangeRateDAO getExchangeRateDAO() {
+        return exchangeRateDAO;
     }
 
     public BigDecimal getRate(String fromCurrency, String toCurrency) {
@@ -64,5 +76,28 @@ public class ExchangeRateService {
         } else {
             throw new RuntimeException("API returned error code: " + responseCode);
         }
+    }
+    public void refreshAllRates(String mainCurrency) {
+        List<String> currencies = Arrays.asList("RUB", "USD", "EUR");
+
+        for (String fromCurrency : currencies) {
+            if (fromCurrency.equals(mainCurrency)) continue;
+
+            try {
+                BigDecimal rate = fetchRateFromAPI(fromCurrency, mainCurrency);
+                exchangeRateDAO.saveRate(fromCurrency, mainCurrency, rate);
+                log.info("Обновлён курс: {} -> {} = {}", fromCurrency, mainCurrency, rate);
+
+                // Также сохраняем обратный курс для оптимизации
+                BigDecimal reverseRate = BigDecimal.ONE.divide(rate, 6, RoundingMode.HALF_UP);
+                exchangeRateDAO.saveRate(mainCurrency, fromCurrency, reverseRate);
+
+            } catch (Exception e) {
+                log.warn("Не удалось обновить курс {} -> {}: {}",
+                        fromCurrency, mainCurrency, e.getMessage());
+            }
+        }
+
+        log.info("Все курсы обновлены относительно {}", mainCurrency);
     }
 }
