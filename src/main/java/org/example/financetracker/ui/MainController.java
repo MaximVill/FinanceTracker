@@ -63,29 +63,38 @@ public class MainController {
     }
 
     private void setupUI() {
-        // Валюта
+        // валюта
         currencyComboBox.getItems().addAll("RUB", "USD", "EUR");
         currencyComboBox.setValue(settingsDAO.getMainCurrency());
 
-        // Категории из БД
+        // категории из БД
         loadCategoriesToComboBox();
 
         datePicker.setValue(LocalDate.now());
 
         // Таблица
-        titleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
-        amountColumn.setCellValueFactory(new PropertyValueFactory<>("amount"));
+        titleColumn.setCellValueFactory(cellData ->
+                new javafx.beans.property.SimpleStringProperty(cellData.getValue().getTitle()));
+
+        amountColumn.setCellValueFactory(cellData ->
+                new javafx.beans.property.SimpleObjectProperty<>(cellData.getValue().getAmount()));
+
+        dateColumn.setCellValueFactory(cellData ->
+                new javafx.beans.property.SimpleObjectProperty<>(cellData.getValue().getTransaction_date()));
+
         categoryColumn.setCellValueFactory(cell -> {
             Transaction t = cell.getValue();
-            String categoryName = t.getCategory() != null ? t.getCategory().getName() : "Без категории";
-            return new javafx.beans.property.SimpleStringProperty(categoryName);
+            if (t.getCategory() != null && t.getCategory().getName() != null) {
+                return new javafx.beans.property.SimpleStringProperty(t.getCategory().getName());
+            } else {
+                return new javafx.beans.property.SimpleStringProperty("Без категории");
+            }
         });
-        dateColumn.setCellValueFactory(new PropertyValueFactory<>("transaction_date"));
 
         transactionsData = FXCollections.observableArrayList();
         transactionsTable.setItems(transactionsData);
 
-        // Валидация
+        // валидация
         amountField.textProperty().addListener((obs, oldVal, newVal) -> {
             if (!newVal.matches("\\d*(\\.\\d*)?")) amountField.setText(oldVal);
         });
@@ -113,7 +122,7 @@ public class MainController {
             t.setCurrency(currencyComboBox.getValue());
             t.setTransaction_date(datePicker.getValue());
 
-            // Категория
+            // категория
             String categoryName = categoryComboBox.getValue();
             Long categoryId = categoryDAO.getIdByName(categoryName);
             t.setCategory_id(categoryId);
