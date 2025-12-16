@@ -85,32 +85,29 @@ public class DatabaseManager {
     }
 
     private static void initDefaultCategories(Connection connection) throws SQLException {
-        // Проверим, есть ли уже категории — чтобы не дублировать
-        String countCategories = "SELECT COUNT(*) FROM CATEGORIES";
-        int count;
-        try (var stmt = connection.prepareStatement(countCategories);
+        String count = "SELECT COUNT(*) FROM categories";
+        try (var stmt = connection.prepareStatement(count);
              var rs = stmt.executeQuery()) {
             rs.next();
-            count = rs.getInt(1);
-        }
+            if (rs.getInt(1) == 0) {
+                String[] income = {"Зарплата", "Подработка", "Подарок"};
+                String[] expense = {"Продукты", "Транспорт", "ЖКХ", "Развлечения", "Одежда"};
 
-        if (count == 0) {
-            String[] income = {"Зарплата", "Подработка", "Подарок"};
-            String[] expense = {"Продукты", "Транспорт", "ЖКХ", "Развлечения", "Одежда"};
-
-            String insert = "INSERT INTO CATEGORIES (name, type) VALUES (?, ?)";
-            try (PreparedStatement ps = connection.prepareStatement(insert)) {
-                for (String name : income) {
-                    ps.setString(1, name);
-                    ps.setString(2, "income");
-                    ps.addBatch();
+                String sql = "INSERT INTO categories (name, type) VALUES (?, ?)";
+                try (PreparedStatement ps = connection.prepareStatement(sql)) {
+                    for (String name : income) {
+                        ps.setString(1, name);
+                        ps.setString(2, "income");
+                        ps.addBatch();
+                    }
+                    for (String name : expense) {
+                        ps.setString(1, name);
+                        ps.setString(2, "expense");
+                        ps.addBatch();
+                    }
+                    ps.executeBatch();
+                    logger.info("Добавлены категории по умолчанию");
                 }
-                for (String name : expense) {
-                    ps.setString(1, name);
-                    ps.setString(2, "expense");
-                    ps.addBatch();
-                }
-                ps.executeBatch();
             }
         }
     }
