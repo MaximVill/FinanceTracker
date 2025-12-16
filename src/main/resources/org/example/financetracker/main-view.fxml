@@ -1,14 +1,61 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="org.example.financetracker.ui.MainController"
-            prefHeight="400.0" prefWidth="600.0">
+<VBox xmlns="http://javafx.com/javafx/17"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="org.example.financetracker.ui.MainController"
+      spacing="10">
 
-</AnchorPane>
+    <padding><Insets topRightBottomLeft="20"/></padding>
+
+    <!-- верхняя панель -->
+    <HBox spacing="20">
+        <VBox>
+            <Label fx:id="balanceLabel" text="Баланс: 0.00" style="-fx-font-size: 24; -fx-font-weight: bold;"/>
+        </VBox>
+        <Button text="🔄 Обновить курсы" onAction="#handleRefreshRates"/>
+    </HBox>
+
+    <!-- ошибка -->
+    <Label fx:id="errorLabel" style="-fx-text-fill: red; -fx-font-weight: bold;" visible="false"/>
+
+    <!-- форма -->
+    <GridPane hgap="10" vgap="10">
+        <Label text="Название:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+        <TextField fx:id="titleField" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+        <Label text="Сумма:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+        <TextField fx:id="amountField" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+        <Label text="Валюта:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+        <ComboBox fx:id="currencyComboBox" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+        <Label text="Дата:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+        <DatePicker fx:id="datePicker" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+
+        <!-- категория с кнопками -->
+        <HBox spacing="5" GridPane.rowIndex="4" GridPane.columnIndex="1">
+            <ComboBox fx:id="categoryComboBox" prefWidth="150"/>
+            <Button text="+" onAction="#handleAddCategory" style="-fx-background-color: green; -fx-text-fill: white;"/>
+            <Button text="-" onAction="#handleDeleteCategory" style="-fx-background-color: red; -fx-text-fill: white;"/>
+        </HBox>
+
+        <Button text="Добавить" onAction="#handleAddTransaction"
+                GridPane.rowIndex="5" GridPane.columnIndex="1"
+                GridPane.halignment="RIGHT"/>
+    </GridPane>
+
+    <!-- табличка -->
+    <TableView fx:id="transactionsTable" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="titleColumn" text="Название" prefWidth="200"/>
+            <TableColumn fx:id="amountColumn" text="Сумма" prefWidth="100"/>
+            <TableColumn fx:id="categoryColumn" text="Категория" prefWidth="150"/>
+            <TableColumn fx:id="dateColumn" text="Дата" prefWidth="100"/>
+        </columns>
+    </TableView>
+
+</VBox>

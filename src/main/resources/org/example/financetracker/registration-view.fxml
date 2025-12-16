@@ -1,7 +1,61 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
 <VBox xmlns="http://javafx.com/javafx/17"
       xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="org.example.financetracker.ui.RegistrationController">
-    <!-- твои элементы -->
+      fx:controller="org.example.financetracker.ui.RegistrationController"
+      alignment="CENTER"
+      spacing="20"
+      style="-fx-background-color: linear-gradient(to bottom, #2c3e50, #3498db); -fx-padding: 40;">
+
+    <Label text="Добро пожаловать в Finance Tracker"
+           style="-fx-text-fill: white; -fx-font-weight: bold;">
+        <font>
+            <Font size="24" />
+        </font>
+    </Label>
+
+    <Label text="Настройте ваш профиль"
+           style="-fx-text-fill: #ecf0f1;">
+        <font>
+            <Font size="16" />
+        </font>
+    </Label>
+
+    <VBox spacing="15" alignment="CENTER_LEFT"
+          style="-fx-background-color: rgba(255,255,255,0.9); -fx-background-radius: 10; -fx-padding: 30;">
+
+        <Label text="Ваше имя (опционально):"
+               style="-fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+        <TextField fx:id="nameField"
+                   promptText="Введите ваше имя"
+                   prefWidth="300"/>
+
+        <Label text="Основная валюта для отображения:*"
+               style="-fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+        <ComboBox fx:id="currencyComboBox"
+                  prefWidth="300"/>
+
+        <Label fx:id="errorLabel"
+               style="-fx-text-fill: #e74c3c; -fx-font-size: 12;"
+               visible="false"/>
+
+        <HBox spacing="10" alignment="CENTER_RIGHT"
+              style="-fx-padding: 20 0 0 0;">
+            <Button fx:id="submitButton"
+                    text="Начать использование"
+                    style="-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-font-weight: bold;"
+                    onAction="#handleSubmit"
+                    prefWidth="200"
+                    prefHeight="40"/>
+        </HBox>
+
+    </VBox>
+
+    <Label text="* Все транзакции будут пересчитываться в эту валюту"
+           style="-fx-text-fill: #bdc3c7; -fx-font-size: 12;"/>
+
 </VBox>
