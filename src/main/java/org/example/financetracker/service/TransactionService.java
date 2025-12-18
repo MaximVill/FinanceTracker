@@ -45,12 +45,10 @@ public class TransactionService {
 
         for (Transaction t : transactions) {
             BigDecimal amount = t.getAmount();
-            // Конвертация валюты
             if (!t.getCurrency().equals(mainCurrency)) {
                 BigDecimal rate = exchangeRateService.getRate(t.getCurrency(), mainCurrency);
                 amount = amount.multiply(rate).setScale(2, RoundingMode.HALF_UP);
             }
-            // Учёт типа транзакции
             if (t.getType() == Transaction.Type.EXPENSE) {
                 amount = amount.negate();
             }

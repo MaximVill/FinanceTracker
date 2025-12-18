@@ -24,18 +24,15 @@ import java.util.List;
 public class MainController {
     private static final Logger log = LoggerFactory.getLogger(MainController.class);
 
-    // UI
     @FXML private Label balanceLabel, errorLabel;
     @FXML private TextField titleField, amountField;
     @FXML private ComboBox<String> currencyComboBox, categoryComboBox, typeComboBox;
     @FXML private DatePicker datePicker;
     @FXML private TableView<Transaction> transactionsTable;
-    @FXML private TableColumn<Transaction, String> titleColumn, categoryColumn, typeColumn;
-    @FXML private TableColumn<Transaction, String> currencyColumn;
+    @FXML private TableColumn<Transaction, String> titleColumn, categoryColumn, typeColumn, currencyColumn;
     @FXML private TableColumn<Transaction, BigDecimal> amountColumn;
     @FXML private TableColumn<Transaction, LocalDate> dateColumn;
 
-    // Данные
     private ObservableList<Transaction> transactionsData;
     private TransactionService transactionService;
     private ExchangeRateService exchangeRateService;
@@ -62,29 +59,21 @@ public class MainController {
     }
 
     private void setupUI() {
-        // Валюта
         currencyComboBox.getItems().addAll("RUB", "USD", "EUR");
         currencyComboBox.setValue(settingsDAO.getMainCurrency());
 
-        // Тип транзакции
         typeComboBox.getItems().addAll("Доход", "Расход");
         typeComboBox.setValue("Расход");
 
-        // Категории
         loadCategoriesToComboBox();
         datePicker.setValue(LocalDate.now());
 
-        // Таблица
-        titleColumn.setCellValueFactory(cell ->
-                new javafx.beans.property.SimpleStringProperty(cell.getValue().getTitle()));
-        amountColumn.setCellValueFactory(cell ->
-                new javafx.beans.property.SimpleObjectProperty<>(cell.getValue().getAmount()));
-        dateColumn.setCellValueFactory(cell ->
-                new javafx.beans.property.SimpleObjectProperty<>(cell.getValue().getTransaction_date()));
+        titleColumn.setCellValueFactory(cell -> new javafx.beans.property.SimpleStringProperty(cell.getValue().getTitle()));
+        amountColumn.setCellValueFactory(cell -> new javafx.beans.property.SimpleObjectProperty<>(cell.getValue().getAmount()));
+        dateColumn.setCellValueFactory(cell -> new javafx.beans.property.SimpleObjectProperty<>(cell.getValue().getTransaction_date()));
         categoryColumn.setCellValueFactory(cell -> {
             Transaction t = cell.getValue();
-            String name = (t.getCategory() != null && t.getCategory().getName() != null)
-                    ? t.getCategory().getName() : "Без категории";
+            String name = (t.getCategory() != null) ? t.getCategory().getName() : "Без категории";
             return new javafx.beans.property.SimpleStringProperty(name);
         });
         typeColumn.setCellValueFactory(cell -> {
@@ -92,14 +81,11 @@ public class MainController {
             String typeStr = (t.getType() == Transaction.Type.INCOME) ? "Доход" : "Расход";
             return new javafx.beans.property.SimpleStringProperty(typeStr);
         });
-
-        currencyColumn.setCellValueFactory(cell ->
-                new javafx.beans.property.SimpleStringProperty(cell.getValue().getCurrency()));
+        currencyColumn.setCellValueFactory(cell -> new javafx.beans.property.SimpleStringProperty(cell.getValue().getCurrency()));
 
         transactionsData = FXCollections.observableArrayList();
         transactionsTable.setItems(transactionsData);
 
-        // Валидация суммы
         amountField.textProperty().addListener((obs, oldVal, newVal) -> {
             if (!newVal.matches("\\d*(\\.\\d*)?")) amountField.setText(oldVal);
         });
@@ -127,12 +113,8 @@ public class MainController {
             t.setCurrency(currencyComboBox.getValue());
             t.setTransaction_date(datePicker.getValue());
 
-            // Тип
-            Transaction.Type type = ("Доход".equals(typeComboBox.getValue()))
-                    ? Transaction.Type.INCOME : Transaction.Type.EXPENSE;
-            t.setType(type);
+            t.setType("Доход".equals(typeComboBox.getValue()) ? Transaction.Type.INCOME : Transaction.Type.EXPENSE);
 
-            // Категория
             String categoryName = categoryComboBox.getValue();
             Long categoryId = categoryDAO.getIdByName(categoryName);
             t.setCategory_id(categoryId);

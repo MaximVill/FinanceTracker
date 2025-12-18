@@ -2,7 +2,9 @@ package org.example.financetracker.db;
 
 import org.example.financetracker.model.Transaction;
 import org.example.financetracker.model.Category;
+import java.math.BigDecimal;
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,8 +16,7 @@ public class TransactionDAO {
     }
 
     public void add(Transaction transaction) {
-        String sql = "INSERT INTO transactions (title, amount, currency, transaction_date, category_id, type) " +
-                "VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO transactions (title, amount, currency, transaction_date, category_id, type) VALUES (?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, transaction.getTitle());
             stmt.setBigDecimal(2, transaction.getAmount());
