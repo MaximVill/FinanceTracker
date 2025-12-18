@@ -6,7 +6,6 @@ import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
 import org.example.financetracker.db.CategoryDAO;
 import org.example.financetracker.db.DatabaseManager;
 import org.example.financetracker.db.ExchangeRateDAO;
@@ -17,7 +16,6 @@ import org.example.financetracker.service.ExchangeRateService;
 import org.example.financetracker.service.TransactionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -26,17 +24,15 @@ import java.util.List;
 public class MainController {
     private static final Logger log = LoggerFactory.getLogger(MainController.class);
 
-    // UI
     @FXML private Label balanceLabel, errorLabel;
     @FXML private TextField titleField, amountField;
-    @FXML private ComboBox<String> currencyComboBox, categoryComboBox;
+    @FXML private ComboBox<String> currencyComboBox, categoryComboBox, typeComboBox;
     @FXML private DatePicker datePicker;
     @FXML private TableView<Transaction> transactionsTable;
-    @FXML private TableColumn<Transaction, String> titleColumn, categoryColumn;
+    @FXML private TableColumn<Transaction, String> titleColumn, categoryColumn, typeColumn, currencyColumn;
     @FXML private TableColumn<Transaction, BigDecimal> amountColumn;
     @FXML private TableColumn<Transaction, LocalDate> dateColumn;
 
-    // Данные
     private ObservableList<Transaction> transactionsData;
     private TransactionService transactionService;
     private ExchangeRateService exchangeRateService;
@@ -63,38 +59,33 @@ public class MainController {
     }
 
     private void setupUI() {
-        // валюта
         currencyComboBox.getItems().addAll("RUB", "USD", "EUR");
         currencyComboBox.setValue(settingsDAO.getMainCurrency());
 
-        // категории из БД
-        loadCategoriesToComboBox();
+        typeComboBox.getItems().addAll("Доход", "Расход");
+        typeComboBox.setValue("Расход");
 
+        loadCategoriesToComboBox();
         datePicker.setValue(LocalDate.now());
 
-        // Таблица
-        titleColumn.setCellValueFactory(cellData ->
-                new javafx.beans.property.SimpleStringProperty(cellData.getValue().getTitle()));
-
-        amountColumn.setCellValueFactory(cellData ->
-                new javafx.beans.property.SimpleObjectProperty<>(cellData.getValue().getAmount()));
-
-        dateColumn.setCellValueFactory(cellData ->
-                new javafx.beans.property.SimpleObjectProperty<>(cellData.getValue().getTransaction_date()));
-
+        titleColumn.setCellValueFactory(cell -> new javafx.beans.property.SimpleStringProperty(cell.getValue().getTitle()));
+        amountColumn.setCellValueFactory(cell -> new javafx.beans.property.SimpleObjectProperty<>(cell.getValue().getAmount()));
+        dateColumn.setCellValueFactory(cell -> new javafx.beans.property.SimpleObjectProperty<>(cell.getValue().getTransaction_date()));
         categoryColumn.setCellValueFactory(cell -> {
             Transaction t = cell.getValue();
-            if (t.getCategory() != null && t.getCategory().getName() != null) {
-                return new javafx.beans.property.SimpleStringProperty(t.getCategory().getName());
-            } else {
-                return new javafx.beans.property.SimpleStringProperty("Без категории");
-            }
+            String name = (t.getCategory() != null) ? t.getCategory().getName() : "Без категории";
+            return new javafx.beans.property.SimpleStringProperty(name);
         });
+        typeColumn.setCellValueFactory(cell -> {
+            Transaction t = cell.getValue();
+            String typeStr = (t.getType() == Transaction.Type.INCOME) ? "Доход" : "Расход";
+            return new javafx.beans.property.SimpleStringProperty(typeStr);
+        });
+        currencyColumn.setCellValueFactory(cell -> new javafx.beans.property.SimpleStringProperty(cell.getValue().getCurrency()));
 
         transactionsData = FXCollections.observableArrayList();
         transactionsTable.setItems(transactionsData);
 
-        // валидация
         amountField.textProperty().addListener((obs, oldVal, newVal) -> {
             if (!newVal.matches("\\d*(\\.\\d*)?")) amountField.setText(oldVal);
         });
@@ -122,7 +113,8 @@ public class MainController {
             t.setCurrency(currencyComboBox.getValue());
             t.setTransaction_date(datePicker.getValue());
 
-            // категория
+            t.setType("Доход".equals(typeComboBox.getValue()) ? Transaction.Type.INCOME : Transaction.Type.EXPENSE);
+
             String categoryName = categoryComboBox.getValue();
             Long categoryId = categoryDAO.getIdByName(categoryName);
             t.setCategory_id(categoryId);
@@ -131,10 +123,8 @@ public class MainController {
             transactionsData.add(0, t);
             updateBalance();
             clearForm();
-
             log.info("Добавлено: {}", t.getTitle());
             showNotification("Добавлено!");
-
         } catch (Exception e) {
             showError("Ошибка: " + e.getMessage());
             log.error("Ошибка добавления", e);
@@ -147,24 +137,19 @@ public class MainController {
         dialog.setTitle("Новая категория");
         dialog.setHeaderText("Введите название категории");
         dialog.setContentText("Название:");
-
         dialog.showAndWait().ifPresent(categoryName -> {
             if (categoryName.trim().isEmpty()) {
                 showError("Название не может быть пустым");
                 return;
             }
-
             if (categoryDAO.exists(categoryName)) {
                 showError("Категория уже существует");
                 return;
             }
-
-            // Спросим тип категории
             ChoiceDialog<String> typeDialog = new ChoiceDialog<>("expense", "expense", "income");
             typeDialog.setTitle("Тип категории");
             typeDialog.setHeaderText("Выберите тип категории");
             typeDialog.setContentText("Тип:");
-
             typeDialog.showAndWait().ifPresent(type -> {
                 Category cat = categoryDAO.add(categoryName, type);
                 if (cat != null) {
@@ -180,15 +165,12 @@ public class MainController {
     private void handleDeleteCategory() {
         String categoryName = categoryComboBox.getValue();
         if (categoryName == null) return;
-
         Long categoryId = categoryDAO.getIdByName(categoryName);
         if (categoryId == null) return;
-
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Удаление категории");
         alert.setHeaderText("Удалить категорию '" + categoryName + "'?");
         alert.setContentText("Категория не будет удалена, если используется в транзакциях.");
-
         alert.showAndWait().ifPresent(response -> {
             if (response == ButtonType.OK) {
                 if (categoryDAO.delete(categoryId)) {
@@ -210,14 +192,11 @@ public class MainController {
                 return null;
             }
         };
-
         task.setOnSucceeded(e -> {
             updateBalance();
             showNotification("Курсы обновлены");
         });
-
         task.setOnFailed(e -> showError("Ошибка обновления"));
-
         new Thread(task).start();
     }
 
@@ -261,7 +240,6 @@ public class MainController {
             errorLabel.setText("⚠️ " + message);
             errorLabel.setVisible(true);
         });
-
         new Thread(() -> {
             try {
                 Thread.sleep(5000);
