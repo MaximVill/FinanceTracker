@@ -15,7 +15,7 @@ public class Transaction {
     @Override
     public String toString() {
         return String.format("Transaction{id=%s, title='%s', type='%s', amount=%s %s, date=%s}",
-                id, title, category_id, amount, currency, transaction_date);
+                id, title, getCategoryType(), amount, currency, transaction_date);
     }
 
     // == ГЕТТЕРЫ ==
@@ -26,6 +26,14 @@ public class Transaction {
     public LocalDate getTransaction_date() {return transaction_date;}
     public Long getCategory_id() {return category_id;}
     public Category getCategory() {return category;}
+
+    // Получить тип транзакции (доход/расход) на основе категории
+    public String getCategoryType() {
+        if (category != null && category.getType() != null) {
+            return "income".equals(category.getType()) ? "Доход" : "Расход";
+        }
+        return "Без категории"; // или можно вернуть просто "Расход", как в сервисе
+    }
 
     // == СЕТТЕРЫ ==
     public void setId(Long id) {this.id = id;}
