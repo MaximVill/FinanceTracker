@@ -7,7 +7,8 @@
 <VBox xmlns="http://javafx.com/javafx/17"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="org.example.financetracker.ui.MainController"
-      spacing="10">
+      spacing="10"
+      stylesheets="@styles.css">
 
     <padding><Insets topRightBottomLeft="20"/></padding>
 
@@ -15,8 +16,18 @@
     <HBox spacing="20">
         <VBox>
             <Label fx:id="balanceLabel" text="Баланс: 0.00" style="-fx-font-size: 24; -fx-font-weight: bold;"/>
+            <HBox spacing="10">
+                <Label fx:id="incomeLabel" text="Доходы: +0.00" style="-fx-text-fill: green;"/>
+                <Label fx:id="expenseLabel" text="Расходы: -0.00" style="-fx-text-fill: red;"/>
+            </HBox>
         </VBox>
-        <Button text="🔄 Обновить курсы" onAction="#handleRefreshRates"/>
+
+        <VBox spacing="5">
+            <Button text="🔄 Обновить курсы" onAction="#handleRefreshRates"/>
+            <Button text="💰 Сменить валюту" onAction="#handleChangeCurrency"/>
+            <Button text="🗑️ Очистить всё" onAction="#handleClearAll"
+                    style="-fx-background-color: #e74c3c; -fx-text-fill: white;"/>
+        </VBox>
     </HBox>
 
     <!-- ошибка -->
@@ -52,7 +63,9 @@
     <TableView fx:id="transactionsTable" VBox.vgrow="ALWAYS">
         <columns>
             <TableColumn fx:id="titleColumn" text="Название" prefWidth="200"/>
+            <TableColumn fx:id="typeColumn" text="Тип" prefWidth="80"/>
             <TableColumn fx:id="amountColumn" text="Сумма" prefWidth="100"/>
+            <TableColumn fx:id="convertedColumn" text="В основной валюте" prefWidth="150"/>
             <TableColumn fx:id="categoryColumn" text="Категория" prefWidth="150"/>
             <TableColumn fx:id="dateColumn" text="Дата" prefWidth="100"/>
         </columns>
