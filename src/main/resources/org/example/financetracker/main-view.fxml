@@ -41,9 +41,13 @@
             <Button text="+" onAction="#handleAddCategory" style="-fx-background-color: green; -fx-text-fill: white;"/>
             <Button text="-" onAction="#handleDeleteCategory" style="-fx-background-color: red; -fx-text-fill: white;"/>
         </HBox>
-        <Button text="Добавить" onAction="#handleAddTransaction"
-                GridPane.rowIndex="5" GridPane.columnIndex="1"
-                GridPane.halignment="RIGHT"/>
+        <!-- КНОПКИ "ЗАРАБОТАЛ" И "ПОТРАТИЛ" -->
+        <HBox spacing="5" GridPane.rowIndex="5" GridPane.columnIndex="1" alignment="CENTER_RIGHT">
+            <Button text="💰 Заработал" onAction="#handleAddIncomeTransaction"
+                    style="-fx-background-color: #2ecc71; -fx-text-fill: white;"/>
+            <Button text="💸 Потратил" onAction="#handleAddExpenseTransaction"
+                    style="-fx-background-color: #e74c3c; -fx-text-fill: white;"/>
+        </HBox>
     </GridPane>
     <!-- табличка -->
     <TableView fx:id="transactionsTable" VBox.vgrow="ALWAYS">
@@ -52,6 +56,8 @@
             <TableColumn fx:id="amountColumn" text="Сумма" prefWidth="100"/>
             <TableColumn fx:id="currencyColumn" text="Валюта" prefWidth="80"/>
             <TableColumn fx:id="categoryColumn" text="Категория" prefWidth="150"/>
+            <!-- НОВАЯ КОЛОНКА -->
+            <TableColumn fx:id="typeColumn" text="Тип" prefWidth="80"/>
             <TableColumn fx:id="dateColumn" text="Дата" prefWidth="100"/>
         </columns>
     </TableView>

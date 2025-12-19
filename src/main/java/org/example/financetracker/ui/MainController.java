@@ -18,7 +18,6 @@ import org.example.financetracker.service.ExchangeRateService;
 import org.example.financetracker.service.TransactionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -33,7 +32,7 @@ public class MainController {
     @FXML private ComboBox<String> currencyComboBox, categoryComboBox;
     @FXML private DatePicker datePicker;
     @FXML private TableView<Transaction> transactionsTable;
-    @FXML private TableColumn<Transaction, String> titleColumn, categoryColumn, currencyColumn;
+    @FXML private TableColumn<Transaction, String> titleColumn, categoryColumn, currencyColumn, typeColumn;
     @FXML private TableColumn<Transaction, BigDecimal> amountColumn;
     @FXML private TableColumn<Transaction, LocalDate> dateColumn;
 
@@ -68,6 +67,7 @@ public class MainController {
         loadCategoriesToComboBox();
         datePicker.setValue(LocalDate.now());
 
+        // Настройка столбцов таблицы
         titleColumn.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getTitle()));
         amountColumn.setCellValueFactory(cell -> new SimpleObjectProperty<>(cell.getValue().getAmount()));
         currencyColumn.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getCurrency()));
@@ -76,6 +76,11 @@ public class MainController {
             Transaction t = cell.getValue();
             String name = (t.getCategory() != null) ? t.getCategory().getName() : "Без категории";
             return new SimpleStringProperty(name);
+        });
+        // НОВЫЙ СТОЛБЕЦ: Тип
+        typeColumn.setCellValueFactory(cell -> {
+            Transaction t = cell.getValue();
+            return new SimpleStringProperty(t.getCategoryType()); // Используем метод из модели
         });
 
         transactionsData = FXCollections.observableArrayList();
@@ -97,10 +102,21 @@ public class MainController {
         }
     }
 
+    // =================== НОВЫЕ МЕТОДЫ ===================
     @FXML
-    private void handleAddTransaction() {
+    private void handleAddIncomeTransaction() {
+        addTransactionWithSign(true); // true = доход
+    }
+
+    @FXML
+    private void handleAddExpenseTransaction() {
+        addTransactionWithSign(false); // false = расход
+    }
+
+    private void addTransactionWithSign(boolean isIncome) {
         try {
             if (!validateInput()) return;
+
             Transaction t = new Transaction();
             t.setTitle(titleField.getText().trim());
             t.setAmount(new BigDecimal(amountField.getText()));
@@ -113,7 +129,11 @@ public class MainController {
 
             if (categoryId != null) {
                 Category category = categoryDAO.getById(categoryId);
-                if (category != null) t.setCategory(category);
+                if (category != null) {
+                    t.setCategory(category);
+                    // Проверка: если тип категории противоречит кнопке, предупредить?
+                    // Сейчас мы просто используем категорию, как есть.
+                }
             }
 
             transactionService.addTransaction(t);
@@ -127,9 +147,9 @@ public class MainController {
             log.error("Ошибка добавления", e);
         }
     }
+    // =====================================================
 
     // Методы handleAddCategory, handleDeleteCategory, handleRefreshRates, handleChangeCurrency, handleClearAll — без изменений по логике
-
     @FXML
     private void handleAddCategory() {
         TextInputDialog dialog = new TextInputDialog();
