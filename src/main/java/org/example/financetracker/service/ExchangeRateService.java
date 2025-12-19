@@ -89,35 +89,53 @@ public class ExchangeRateService {
             URL url = new URL(CB_API_URL);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
-            conn.setConnectTimeout(5000);
-            conn.setReadTimeout(5000);
+            conn.setConnectTimeout(10000);
+            conn.setReadTimeout(10000);
 
-            // если код 200 (успешно)
-            if (conn.getResponseCode() == 200) {
-                BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-                StringBuilder response = new StringBuilder();
-                String line;
-                while ((line = in.readLine()) != null) {
-                    response.append(line);
-                }
-                in.close();
+            conn.setRequestProperty("User-Agent", "Mozilla/5.0");
+            conn.setRequestProperty("Accept", "application/json");
 
-                ObjectMapper mapper = new ObjectMapper();
-                JsonNode root = mapper.readTree(response.toString());
-                JsonNode valute = root.get("Valute");
-                if (valute.has(currency)) {
-                    BigDecimal rate = new BigDecimal(valute.get(currency).get("Value").asText())
-                            .setScale(6, RoundingMode.HALF_UP);
-                    return rate;
-                } else {
-                    log.warn("Валюта {} не найдена в ответе ЦБ", currency);
-                    return null;
+            int responseCode = conn.getResponseCode();
+
+            if (responseCode == 200) {
+                try (BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
+                    StringBuilder response = new StringBuilder();
+                    String line;
+                    while ((line = in.readLine()) != null) {
+                        response.append(line);
+                    }
+
+                    ObjectMapper mapper = new ObjectMapper();
+                    JsonNode root = mapper.readTree(response.toString());
+                    JsonNode valute = root.get("Valute");
+
+                    // Используем правильные коды валют
+                    String currencyCode = currency;
+                    if ("USD".equals(currency)) currencyCode = "USD";
+                    if ("EUR".equals(currency)) currencyCode = "EUR";
+
+                    if (valute.has(currencyCode)) {
+                        JsonNode currencyNode = valute.get(currencyCode);
+                        BigDecimal rate = new BigDecimal(currencyNode.get("Value").asText())
+                                .divide(new BigDecimal(currencyNode.get("Nominal").asText()), 6, RoundingMode.HALF_UP);
+
+                        log.info("Получен курс {} → RUB: {}", currency, rate);
+                        return rate;
+                    } else {
+                        log.warn("Валюта {} не найдена в ответе ЦБ", currency);
+                        // Возвращаем кэшированное значение
+                        return cached != null ? cached.getRate() : BigDecimal.ONE;
+                    }
                 }
+            } else {
+                log.warn("Ошибка HTTP {} при запросе к ЦБ", responseCode);
+                return cached != null ? cached.getRate() : BigDecimal.ONE;
             }
         } catch (Exception e) {
             log.error("Ошибка при запросе к ЦБ для {}", currency, e);
+            ExchangeRate cached = exchangeRateDAO.getRate(currency, "RUB");
+            return cached != null ? cached.getRate() : BigDecimal.ONE;
         }
-        return null;
     }
 
     // проверка на актуальность по времени

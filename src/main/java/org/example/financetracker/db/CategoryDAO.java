@@ -136,6 +136,26 @@ public class CategoryDAO {
         return null;
     }
 
+    public Category getById(long id) {
+        String sql = "SELECT id, name, type FROM categories WHERE id = ?";
+        try (Connection conn = DataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, id);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    Category cat = new Category();
+                    cat.setId(rs.getLong("id"));
+                    cat.setName(rs.getString("name"));
+                    cat.setType(rs.getString("type"));
+                    return cat;
+                }
+            }
+        } catch (SQLException e) {
+            log.error("Ошибка получения категории по ID: {}", id, e);
+        }
+        return null;
+    }
+
     // Вспомогательный: проверка использования категории
     private boolean isUsed(long categoryId) {
         String sql = "SELECT COUNT(*) FROM transactions WHERE category_id = ?";

@@ -18,22 +18,21 @@ public class SettingsDAO {
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
 
-            if (!rs.next()) {
-                // Нет записи — создаём
+            if (rs.next()) {
+                String currency = rs.getString("main_currency");
+                return currency != null ? currency : "RUB";
+            } else {
+                // Создаем запись по умолчанию
                 try (PreparedStatement insert = conn.prepareStatement(
-                        "INSERT INTO app_settings (id, main_currency) VALUES (1, ?)")) {
-                    insert.setString(1, "RUB");
+                        "INSERT INTO app_settings (id, main_currency) VALUES (1, 'RUB')")) {
                     insert.executeUpdate();
                 }
                 return "RUB";
-            } else {
-                // Есть запись - возвращаем валюту
-                return rs.getString("main_currency");  // ← ВОТ ЗДЕСЬ ИСПРАВЛЕНИЕ!
             }
 
         } catch (SQLException e) {
             log.error("Ошибка при чтении настроек", e);
-            throw new RuntimeException("Failed to read settings", e);
+            return "RUB"; // Значение по умолчанию
         }
     }
 

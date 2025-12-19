@@ -7,10 +7,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import org.example.financetracker.db.SettingsDAO;
-import org.example.financetracker.model.UserSettings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 
 public class RegistrationController {
@@ -18,13 +16,10 @@ public class RegistrationController {
 
     @FXML
     private TextField nameField;
-
     @FXML
     private ComboBox<String> currencyComboBox;
-
     @FXML
     private Button submitButton;
-
     @FXML
     private Label errorLabel;
 
@@ -33,7 +28,6 @@ public class RegistrationController {
         // Инициализация выпадающего списка валют
         currencyComboBox.getItems().addAll("RUB", "USD", "EUR");
         currencyComboBox.setValue("RUB");
-
         // Настройка валидации
         setupValidation();
     }
@@ -51,24 +45,19 @@ public class RegistrationController {
     private void handleSubmit() {
         String userName = nameField.getText().trim();
         String mainCurrency = currencyComboBox.getValue();
-
         // Валидация
         if (mainCurrency == null || mainCurrency.isEmpty()) {
             showError("Пожалуйста, выберите валюту");
             return;
         }
-
         try {
             // Сохраняем настройки в БД
             SettingsDAO settingsDAO = new SettingsDAO();
             settingsDAO.setMainCurrency(mainCurrency);
-
             log.info("Пользователь зарегистрирован: имя='{}', валюта='{}'",
                     userName.isEmpty() ? "Гость" : userName, mainCurrency);
-
             // Переход на основной экран
             switchToMainScreen();
-
         } catch (Exception e) {
             log.error("Ошибка при сохранении настроек", e);
             showError("Ошибка сохранения настроек: " + e.getMessage());
@@ -79,15 +68,12 @@ public class RegistrationController {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/financetracker/main-view.fxml"));
             Parent root = loader.load();
-
             Stage stage = (Stage) submitButton.getScene().getWindow();
             Scene scene = new Scene(root, 900, 600);
             stage.setScene(scene);
             stage.setTitle("Finance Tracker - Главный экран");
             stage.centerOnScreen();
-
             log.info("Переход на главный экран");
-
         } catch (IOException e) {
             log.error("Ошибка загрузки главного экрана", e);
             showError("Не удалось загрузить главный экран");
