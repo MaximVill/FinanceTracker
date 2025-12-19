@@ -18,8 +18,8 @@
         </VBox>
         <VBox spacing="5">
             <Button text="🔄 Обновить курсы" onAction="#handleRefreshRates"/>
-            <Button text="💰 Сменить валюту" onAction="#handleChangeCurrency"/>
-            <Button text="🗑️ Очистить всё" onAction="#handleClearAll"
+            <Button text="Сменить валюту" onAction="#handleChangeCurrency"/>
+            <Button text="Очистить всё" onAction="#handleClearAll"
                     style="-fx-background-color: #e74c3c; -fx-text-fill: white;"/>
         </VBox>
     </HBox>
@@ -43,9 +43,9 @@
         </HBox>
         <!-- КНОПКИ "ЗАРАБОТАЛ" И "ПОТРАТИЛ" -->
         <HBox spacing="5" GridPane.rowIndex="5" GridPane.columnIndex="1" alignment="CENTER_RIGHT">
-            <Button text="💰 Заработал" onAction="#handleAddIncomeTransaction"
+            <Button text="Заработал" onAction="#handleAddIncomeTransaction"
                     style="-fx-background-color: #2ecc71; -fx-text-fill: white;"/>
-            <Button text="💸 Потратил" onAction="#handleAddExpenseTransaction"
+            <Button text="Потратил" onAction="#handleAddExpenseTransaction"
                     style="-fx-background-color: #e74c3c; -fx-text-fill: white;"/>
         </HBox>
     </GridPane>
@@ -59,6 +59,8 @@
             <!-- НОВАЯ КОЛОНКА -->
             <TableColumn fx:id="typeColumn" text="Тип" prefWidth="80"/>
             <TableColumn fx:id="dateColumn" text="Дата" prefWidth="100"/>
+            <!-- НОВАЯ КОЛОНКА С КНОПКАМИ -->
+            <TableColumn fx:id="actionsColumn" text="Действия" prefWidth="120"/>
         </columns>
     </TableView>
 </VBox>

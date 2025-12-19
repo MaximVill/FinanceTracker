@@ -7,7 +7,11 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.scene.control.*;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.util.Callback;
 import org.example.financetracker.db.CategoryDAO;
 import org.example.financetracker.db.DatabaseManager;
 import org.example.financetracker.db.ExchangeRateDAO;
@@ -35,6 +39,8 @@ public class MainController {
     @FXML private TableColumn<Transaction, String> titleColumn, categoryColumn, currencyColumn, typeColumn;
     @FXML private TableColumn<Transaction, BigDecimal> amountColumn;
     @FXML private TableColumn<Transaction, LocalDate> dateColumn;
+    // Новая колонка с кнопками
+    @FXML private TableColumn<Transaction, Void> actionsColumn;
 
     private ObservableList<Transaction> transactionsData;
     private TransactionService transactionService;
@@ -81,6 +87,46 @@ public class MainController {
         typeColumn.setCellValueFactory(cell -> {
             Transaction t = cell.getValue();
             return new SimpleStringProperty(t.getCategoryType()); // Используем метод из модели
+        });
+
+        // НОВЫЙ СТОЛБЕЦ: Действия
+        actionsColumn.setCellFactory(new Callback<TableColumn<Transaction, Void>, TableCell<Transaction, Void>>() {
+            @Override
+            public TableCell<Transaction, Void> call(TableColumn<Transaction, Void> param) {
+                return new TableCell<Transaction, Void>() {
+                    private final Button editButton = new Button("Редактировать");
+                    private final Button deleteButton = new Button("Удалить");
+
+                    {
+                        editButton.setOnAction(event -> {
+                            Transaction transaction = getTableRow().getItem();
+                            if (transaction != null) {
+                                openEditDialog(transaction);
+                            }
+                        });
+                        deleteButton.setOnAction(event -> {
+                            Transaction transaction = getTableRow().getItem();
+                            if (transaction != null) {
+                                handleDeleteTransaction(transaction);
+                            }
+                        });
+                        editButton.setStyle("-fx-background-color: #f39c12; -fx-text-fill: white;");
+                        deleteButton.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white;");
+                    }
+
+                    @Override
+                    protected void updateItem(Void item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (empty) {
+                            setGraphic(null);
+                        } else {
+                            HBox box = new HBox(editButton, deleteButton);
+                            box.setSpacing(5);
+                            setGraphic(box);
+                        }
+                    }
+                };
+            }
         });
 
         transactionsData = FXCollections.observableArrayList();
@@ -145,6 +191,148 @@ public class MainController {
         } catch (Exception e) {
             showError("Ошибка: " + e.getMessage());
             log.error("Ошибка добавления", e);
+        }
+    }
+
+    private void handleDeleteTransaction(Transaction transaction) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Удаление транзакции");
+        alert.setHeaderText("Удалить транзакцию '" + transaction.getTitle() + "'?");
+        alert.setContentText("Это действие нельзя отменить.");
+        alert.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                try {
+                    transactionService.deleteTransaction(transaction.getId());
+                    transactionsData.remove(transaction);
+                    updateBalance();
+                    showNotification("Транзакция удалена");
+                } catch (Exception e) {
+                    showError("Ошибка удаления: " + e.getMessage());
+                    log.error("Ошибка удаления транзакции", e);
+                }
+            }
+        });
+    }
+
+    private void openEditDialog(Transaction transaction) {
+        // Создаем модальное окно
+        Dialog<ButtonType> dialog = new Dialog<>();
+        dialog.setTitle("Редактирование транзакции");
+        dialog.setHeaderText("Измените данные транзакции");
+
+        // Устанавливаем кнопки
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+        // Создаем форму редактирования
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(20, 150, 10, 10));
+
+        TextField editTitleField = new TextField(transaction.getTitle());
+        TextField editAmountField = new TextField(transaction.getAmount().toString());
+        ComboBox<String> editCurrencyComboBox = new ComboBox<>();
+        editCurrencyComboBox.getItems().addAll("RUB", "USD", "EUR");
+        editCurrencyComboBox.setValue(transaction.getCurrency());
+
+        DatePicker editDatePicker = new DatePicker(transaction.getTransaction_date());
+
+        ComboBox<String> editCategoryComboBox = new ComboBox<>();
+        loadCategoriesToComboBox(editCategoryComboBox); // Загружаем категории в этот ComboBox
+        if (transaction.getCategory() != null) {
+            editCategoryComboBox.setValue(transaction.getCategory().getName());
+        }
+
+        // Добавляем поля в сетку
+        grid.add(new Label("Название:"), 0, 0);
+        grid.add(editTitleField, 1, 0);
+        grid.add(new Label("Сумма:"), 0, 1);
+        grid.add(editAmountField, 1, 1);
+        grid.add(new Label("Валюта:"), 0, 2);
+        grid.add(editCurrencyComboBox, 1, 2);
+        grid.add(new Label("Дата:"), 0, 3);
+        grid.add(editDatePicker, 1, 3);
+        grid.add(new Label("Категория:"), 0, 4);
+        grid.add(editCategoryComboBox, 1, 4);
+
+        dialog.getDialogPane().setContent(grid);
+
+        // Валидация перед сохранением
+        Platform.runLater(() -> editTitleField.requestFocus());
+
+        // Результат при нажатии OK
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == ButtonType.OK) {
+                if (editTitleField.getText().trim().isEmpty()) {
+                    showError("Введите название");
+                    return null;
+                }
+                if (editAmountField.getText().trim().isEmpty()) {
+                    showError("Введите сумму");
+                    return null;
+                }
+                try {
+                    // Обновляем транзакцию
+                    transaction.setTitle(editTitleField.getText().trim());
+                    transaction.setAmount(new BigDecimal(editAmountField.getText()));
+                    transaction.setCurrency(editCurrencyComboBox.getValue());
+                    transaction.setTransaction_date(editDatePicker.getValue());
+
+                    String categoryName = editCategoryComboBox.getValue();
+                    Long categoryId = categoryDAO.getIdByName(categoryName);
+                    transaction.setCategory_id(categoryId);
+
+                    if (categoryId != null) {
+                        Category category = categoryDAO.getById(categoryId);
+                        if (category != null) {
+                            transaction.setCategory(category);
+                        }
+                    }
+
+                    // Сохраняем изменения
+                    saveTransaction(transaction);
+
+                    // Обновляем UI
+                    int index = transactionsData.indexOf(transaction);
+                    if (index >= 0) {
+                        transactionsData.set(index, transaction);
+                    }
+                    updateBalance();
+                    showNotification("Транзакция обновлена");
+                    return dialogButton;
+                } catch (Exception e) {
+                    showError("Ошибка: " + e.getMessage());
+                    log.error("Ошибка редактирования", e);
+                    return null;
+                }
+            }
+            return dialogButton;
+        });
+
+        dialog.showAndWait();
+    }
+
+    private void saveTransaction(Transaction transaction) {
+        // Простая реализация: создаем новый объект, чтобы не менять старый
+        // В реальности, нужно было бы сделать UPDATE в DAO
+        // Но сейчас я просто удаляю старую и добавляю новую, потому что в текущей архитектуре нет метода updateTransaction в DAO
+        try {
+            transactionService.deleteTransaction(transaction.getId());
+            transactionService.addTransaction(transaction);
+        } catch (Exception e) {
+            throw new RuntimeException("Не удалось обновить транзакцию", e);
+        }
+    }
+
+    // Метод для загрузки категорий в конкретный ComboBox (например, в диалоге)
+    private void loadCategoriesToComboBox(ComboBox<String> comboBox) {
+        comboBox.getItems().clear();
+        List<Category> categories = categoryDAO.getAll();
+        for (Category cat : categories) {
+            comboBox.getItems().add(cat.getName());
+        }
+        if (!categories.isEmpty()) {
+            comboBox.setValue(categories.get(0).getName());
         }
     }
     // =====================================================
