@@ -80,12 +80,13 @@ public class TransactionDAO {
                 t.setCategory_id(rs.getLong("category_id"));
 
                 // Если есть категория, создаем объект
-                if (rs.getLong("category_id") > 0) {
+                String categoryName = rs.getString("category_name");
+                if (categoryName != null) {
                     Category cat = new Category();
                     cat.setId(rs.getLong("category_id"));
-                    cat.setName(rs.getString("category_name"));
+                    cat.setName(categoryName);
                     cat.setType(rs.getString("category_type"));
-                    t.setCategory(cat); // Используем новый сеттер
+                    t.setCategory(cat);
                 }
 
                 transactions.add(t);
