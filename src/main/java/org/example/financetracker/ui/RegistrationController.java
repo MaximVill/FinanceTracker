@@ -25,15 +25,9 @@ public class RegistrationController {
 
     @FXML
     private void initialize() {
-        // Инициализация выпадающего списка валют
         currencyComboBox.getItems().addAll("RUB", "USD", "EUR");
         currencyComboBox.setValue("RUB");
-        // Настройка валидации
-        setupValidation();
-    }
 
-    private void setupValidation() {
-        // Имя может быть пустым, но если введено - проверить длину
         nameField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue.length() > 50) {
                 nameField.setText(oldValue);
@@ -45,18 +39,20 @@ public class RegistrationController {
     private void handleSubmit() {
         String userName = nameField.getText().trim();
         String mainCurrency = currencyComboBox.getValue();
-        // Валидация
+
         if (mainCurrency == null || mainCurrency.isEmpty()) {
             showError("Пожалуйста, выберите валюту");
             return;
         }
+
         try {
-            // Сохраняем настройки в БД
             SettingsDAO settingsDAO = new SettingsDAO();
             settingsDAO.setMainCurrency(mainCurrency);
+            settingsDAO.setFirstLaunchComplete(); // Важно: отмечаем завершение первого запуска
+
             log.info("Пользователь зарегистрирован: имя='{}', валюта='{}'",
                     userName.isEmpty() ? "Гость" : userName, mainCurrency);
-            // Переход на основной экран
+
             switchToMainScreen();
         } catch (Exception e) {
             log.error("Ошибка при сохранении настроек", e);

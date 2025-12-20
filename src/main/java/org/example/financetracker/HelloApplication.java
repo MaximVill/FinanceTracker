@@ -13,29 +13,19 @@ public class HelloApplication extends Application {
 
     @Override
     public void start(Stage stage) throws IOException, SQLException {
-        DatabaseManager.initializeDatabase(); // Инициализация БД при запуске
+        // Инициализация БД
+        DatabaseManager.initializeDatabase();
 
+        // Создаем настройки по умолчанию
         SettingsDAO settingsDAO = new SettingsDAO();
-        String mainCurrency = settingsDAO.getMainCurrency();
+        settingsDAO.createDefaultSettings();
 
-        // Проверяем, был ли уже установлен профиль (если валюта не RUB по умолчанию или запись существует)
-        if ("RUB".equals(mainCurrency)) {
-            // Это может быть значение по умолчанию, нужно проверить, создана ли запись
-            // Но в текущей логике SettingsDAO при чтении создаёт запись, если её нет
-            // Поэтому проверим, есть ли запись с id=1
-            try (var conn = DatabaseManager.getConnection()) {
-                var stmt = conn.prepareStatement("SELECT COUNT(*) FROM app_settings WHERE id = 1");
-                var rs = stmt.executeQuery();
-                if (rs.next() && rs.getInt(1) > 0) {
-                    // Запись существует — значит, пользователь уже регистрировался
-                    loadMainScreen(stage);
-                } else {
-                    // Записи нет — первый запуск
-                    loadRegistrationScreen(stage);
-                }
-            }
+        // Проверяем, первый ли запуск
+        if (settingsDAO.isFirstLaunch()) {
+            // Первый запуск - показываем экран регистрации
+            loadRegistrationScreen(stage);
         } else {
-            // Основная валюта не RUB — значит, пользователь уже настроил профиль
+            // Уже регистрировался - показываем главный экран
             loadMainScreen(stage);
         }
     }

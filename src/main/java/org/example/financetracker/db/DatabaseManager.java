@@ -65,20 +65,18 @@ public class DatabaseManager {
             """;
 
         String createSettings = """
-                CREATE TABLE IF NOT EXISTS app_settings (
-                      id INT PRIMARY KEY,
-                      main_currency VARCHAR(3) NOT NULL DEFAULT 'RUB'
-                  );
+            CREATE TABLE IF NOT EXISTS app_settings (
+                id INT PRIMARY KEY,
+                main_currency VARCHAR(3) NOT NULL DEFAULT 'RUB',
+                first_launch BOOLEAN DEFAULT TRUE
+            );
             """;
 
-        try (Connection conn = DataSource.getConnection();
-             Statement stmt = conn.createStatement()) {
-
+        try (Statement stmt = connection.createStatement()) {
             stmt.execute(createTransactions);
             stmt.execute(createCategories);
             stmt.execute(createExchangeRates);
             stmt.execute(createSettings);
-
         } catch (SQLException e) {
             throw new RuntimeException("Failed to initialize database", e);
         }
