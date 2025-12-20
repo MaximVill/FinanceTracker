@@ -34,7 +34,6 @@ public class TransactionService {
         this.settingsDAO = new SettingsDAO();
     }
 
-
     // Добавление транзакции
     public void addTransaction(Transaction transaction) {
         transactionDAO.add(transaction);

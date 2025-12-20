@@ -2,12 +2,14 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+
 <VBox xmlns="http://javafx.com/javafx/17"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="org.example.financetracker.ui.MainController"
       spacing="10">
     <padding><Insets topRightBottomLeft="20"/></padding>
-    <!-- верхняя панель -->
+
+    <!-- верхняя панель с балансом -->
     <HBox spacing="20">
         <VBox>
             <Label fx:id="balanceLabel" text="Баланс: 0.00" style="-fx-font-size: 24; -fx-font-weight: bold;"/>
@@ -23,43 +25,27 @@
                     style="-fx-background-color: #e74c3c; -fx-text-fill: white;"/>
         </VBox>
     </HBox>
-    <!-- ошибка -->
+
+    <!-- сообщение об ошибке -->
     <Label fx:id="errorLabel" style="-fx-text-fill: red; -fx-font-weight: bold;" visible="false"/>
-    <!-- форма -->
-    <GridPane hgap="10" vgap="10">
-        <Label text="Название:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-        <TextField fx:id="titleField" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
-        <Label text="Сумма:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-        <TextField fx:id="amountField" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
-        <Label text="Валюта:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-        <ComboBox fx:id="currencyComboBox" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
-        <Label text="Дата:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
-        <DatePicker fx:id="datePicker" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
-        <!-- категория с кнопками -->
-        <HBox spacing="5" GridPane.rowIndex="4" GridPane.columnIndex="1">
-            <ComboBox fx:id="categoryComboBox" prefWidth="150"/>
-            <Button text="+" onAction="#handleAddCategory" style="-fx-background-color: green; -fx-text-fill: white;"/>
-            <Button text="-" onAction="#handleDeleteCategory" style="-fx-background-color: red; -fx-text-fill: white;"/>
-        </HBox>
-        <!-- КНОПКИ "ЗАРАБОТАЛ" И "ПОТРАТИЛ" -->
-        <HBox spacing="5" GridPane.rowIndex="5" GridPane.columnIndex="1" alignment="CENTER_RIGHT">
-            <Button text="Заработал" onAction="#handleAddIncomeTransaction"
-                    style="-fx-background-color: #2ecc71; -fx-text-fill: white;"/>
-            <Button text="Потратил" onAction="#handleAddExpenseTransaction"
-                    style="-fx-background-color: #e74c3c; -fx-text-fill: white;"/>
-        </HBox>
-    </GridPane>
-    <!-- табличка -->
+
+    <!-- кнопки добавления транзакций -->
+    <HBox spacing="20" alignment="CENTER">
+        <Button text="➕ Добавить доход" onAction="#handleAddIncome"
+                style="-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-font-size: 16; -fx-padding: 15 30;"/>
+        <Button text="➖ Добавить расход" onAction="#handleAddExpense"
+                style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-size: 16; -fx-padding: 15 30;"/>
+    </HBox>
+
+    <!-- таблица транзакций -->
     <TableView fx:id="transactionsTable" VBox.vgrow="ALWAYS">
         <columns>
             <TableColumn fx:id="titleColumn" text="Название" prefWidth="200"/>
             <TableColumn fx:id="amountColumn" text="Сумма" prefWidth="100"/>
             <TableColumn fx:id="currencyColumn" text="Валюта" prefWidth="80"/>
             <TableColumn fx:id="categoryColumn" text="Категория" prefWidth="150"/>
-            <!-- НОВАЯ КОЛОНКА -->
             <TableColumn fx:id="typeColumn" text="Тип" prefWidth="80"/>
             <TableColumn fx:id="dateColumn" text="Дата" prefWidth="100"/>
-            <!-- НОВАЯ КОЛОНКА С КНОПКАМИ -->
             <TableColumn fx:id="actionsColumn" text="Действия" prefWidth="120"/>
         </columns>
     </TableView>
