@@ -5,6 +5,7 @@ target/
 .idea/
 *.iml
 out/
+.vscode/
 
 # Logs
 logs/
@@ -13,3 +14,7 @@ logs/
 # OS
 .DS_Store
 Thumbs.db
+
+# H2 Database files
+finance_tracker.mv.db
+finance_tracker.trace.db
