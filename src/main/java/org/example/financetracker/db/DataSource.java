@@ -5,8 +5,8 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class DataSource {
-    private static final String URL = "jdbc:h2:./finance_tracker;DB_CLOSE_ON_EXIT=FALSE;USER=sa;PASSWORD=";
-    private static final String USER = "";
+    private static final String URL = "jdbc:h2:./finance_tracker;DB_CLOSE_ON_EXIT=FALSE";
+    private static final String USER = "sa";
     private static final String PASSWORD = "";
 
     static {
@@ -18,10 +18,6 @@ public class DataSource {
     }
 
     public static Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(
-                "jdbc:h2:./finance_tracker;DB_CLOSE_ON_EXIT=FALSE",
-                "sa",
-                ""
-        );
+        return DriverManager.getConnection(URL, USER, PASSWORD);
     }
 }

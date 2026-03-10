@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      alignment="CENTER" spacing="16"
+      style="-fx-background-color: #f4f4fb; -fx-padding: 40;">
+    <Label text="⚙️" style="-fx-font-size: 64;"/>
+    <Label text="Настройки" style="-fx-font-size: 28; -fx-font-weight: bold; -fx-text-fill: #1a1a2e;"/>
+    <Label text="Раздел в разработке"
+           style="-fx-font-size: 15; -fx-text-fill: #9090a8;"/>
+</VBox>

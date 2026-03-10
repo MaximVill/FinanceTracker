@@ -11,7 +11,7 @@
       spacing="20"
       style="-fx-background-color: linear-gradient(to bottom, #2c3e50, #3498db); -fx-padding: 40;">
 
-    <Label text="Добро пожаловать в Finance Tracker"
+    <Label text="Добро пожаловать в FinTrackGo"
            style="-fx-text-fill: white; -fx-font-weight: bold;">
         <font>
             <Font size="24" />

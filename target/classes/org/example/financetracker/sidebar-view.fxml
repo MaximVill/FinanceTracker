@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox fx:id="sidebarRoot"
+      xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="org.example.financetracker.ui.SidebarController"
+      prefWidth="240" minWidth="60"
+      style="-fx-background-color: #ffffff; -fx-border-color: #e8e8f0; -fx-border-width: 0 1 0 0;">
+
+    <!-- TOP: Logo + Collapse button -->
+    <HBox fx:id="logoBox" alignment="CENTER_LEFT" spacing="10" style="-fx-padding: 18 12 18 16;">
+        <Label fx:id="logoIcon"
+               text="FT"
+               style="-fx-background-color: #6c63ff; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 18; -fx-background-radius: 10; -fx-padding: 6 10 6 10;"/>
+        <VBox fx:id="logoTextBox" spacing="1">
+            <Label text="FinTrackGo"
+                   style="-fx-font-weight: bold; -fx-font-size: 14; -fx-text-fill: #1a1a2e;"/>
+            <Label text="Умный трекер финансов"
+                   style="-fx-font-size: 10; -fx-text-fill: #9090a8;"/>
+        </VBox>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button fx:id="collapseBtn" onAction="#handleCollapse"
+                text="⊟"
+                style="-fx-background-color: transparent; -fx-text-fill: #9090a8; -fx-font-size: 16; -fx-cursor: hand; -fx-padding: 4 6 4 6; -fx-background-radius: 6;"
+                onMouseEntered="#onCollapseHover"
+                onMouseExited="#onCollapseExit"/>
+    </HBox>
+
+    <!-- NAV ITEMS -->
+    <VBox fx:id="navBox" spacing="2" style="-fx-padding: 4 8 4 8;">
+
+        <Button fx:id="btnHome" onAction="#handleHome"
+                text="🏠  Главная"
+                maxWidth="Infinity" alignment="BASELINE_LEFT"
+                style="-fx-background-color: #ededff; -fx-text-fill: #6c63ff; -fx-font-weight: bold; -fx-font-size: 13; -fx-padding: 10 14 10 14; -fx-background-radius: 8; -fx-cursor: hand;"/>
+
+        <Button fx:id="btnSummary" onAction="#handleSummary"
+                text="📊  Сводка"
+                maxWidth="Infinity" alignment="BASELINE_LEFT"
+                style="-fx-background-color: transparent; -fx-text-fill: #4a4a6a; -fx-font-size: 13; -fx-padding: 10 14 10 14; -fx-background-radius: 8; -fx-cursor: hand;"/>
+
+        <Button fx:id="btnHistory" onAction="#handleHistory"
+                text="🕐  История"
+                maxWidth="Infinity" alignment="BASELINE_LEFT"
+                style="-fx-background-color: transparent; -fx-text-fill: #4a4a6a; -fx-font-size: 13; -fx-padding: 10 14 10 14; -fx-background-radius: 8; -fx-cursor: hand;"/>
+
+        <Button fx:id="btnGoals" onAction="#handleGoals"
+                text="🎯  Цели"
+                maxWidth="Infinity" alignment="BASELINE_LEFT"
+                style="-fx-background-color: transparent; -fx-text-fill: #4a4a6a; -fx-font-size: 13; -fx-padding: 10 14 10 14; -fx-background-radius: 8; -fx-cursor: hand;"/>
+
+        <Button fx:id="btnPlanner" onAction="#handlePlanner"
+                text="📅  Планировщик"
+                maxWidth="Infinity" alignment="BASELINE_LEFT"
+                style="-fx-background-color: transparent; -fx-text-fill: #4a4a6a; -fx-font-size: 13; -fx-padding: 10 14 10 14; -fx-background-radius: 8; -fx-cursor: hand;"/>
+
+        <Button fx:id="btnDebts" onAction="#handleDebts"
+                text="🤝  Долги"
+                maxWidth="Infinity" alignment="BASELINE_LEFT"
+                style="-fx-background-color: transparent; -fx-text-fill: #4a4a6a; -fx-font-size: 13; -fx-padding: 10 14 10 14; -fx-background-radius: 8; -fx-cursor: hand;"/>
+    </VBox>
+
+    <!-- SPACER -->
+    <Region VBox.vgrow="ALWAYS"/>
+
+    <!-- BOTTOM: User info + Settings -->
+    <VBox fx:id="bottomBox" style="-fx-padding: 8 8 4 8;" spacing="0">
+
+        <Separator style="-fx-opacity: 0.3;"/>
+
+        <HBox fx:id="userBox" alignment="CENTER_LEFT" spacing="10"
+              style="-fx-padding: 14 8 10 8; -fx-cursor: hand;">
+            <Label fx:id="avatarLabel"
+                   text="👤"
+                   style="-fx-font-size: 28;"/>
+            <VBox fx:id="userTextBox" spacing="1">
+                <Label fx:id="userNameLabel"
+                       text="Пользователь"
+                       style="-fx-font-weight: bold; -fx-font-size: 13; -fx-text-fill: #1a1a2e;"/>
+                <Label fx:id="userEmailLabel"
+                       text=""
+                       style="-fx-font-size: 11; -fx-text-fill: #9090a8;"/>
+            </VBox>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label fx:id="chevronLabel" text="∧"
+                   style="-fx-text-fill: #9090a8; -fx-font-size: 11;"/>
+        </HBox>
+
+        <Button fx:id="btnSettings" onAction="#handleSettings"
+                text="⚙  Настройки"
+                maxWidth="Infinity" alignment="BASELINE_LEFT"
+                style="-fx-background-color: transparent; -fx-text-fill: #4a4a6a; -fx-font-size: 13; -fx-padding: 8 14 8 14; -fx-background-radius: 8; -fx-cursor: hand;"/>
+
+        <Label fx:id="copyrightLabel"
+               text="© 2026 FinTrackGo"
+               maxWidth="Infinity" alignment="CENTER"
+               style="-fx-font-size: 10; -fx-text-fill: #c0c0d0; -fx-padding: 10 0 6 0;"/>
+    </VBox>
+</VBox>

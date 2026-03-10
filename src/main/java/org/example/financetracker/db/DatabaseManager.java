@@ -73,11 +73,23 @@ public class DatabaseManager {
             );
             """;
 
+        String createAccounts = """
+            CREATE TABLE IF NOT EXISTS ACCOUNTS (
+                id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                name VARCHAR(100) NOT NULL,
+                color VARCHAR(20) NOT NULL DEFAULT '#6c63ff',
+                currency VARCHAR(3) NOT NULL DEFAULT 'RUB',
+                balance DECIMAL(15, 2) NOT NULL DEFAULT 0,
+                sort_order INT DEFAULT 0
+            )
+            """;
+
         try (Statement stmt = connection.createStatement()) {
             stmt.execute(createTransactions);
             stmt.execute(createCategories);
             stmt.execute(createExchangeRates);
             stmt.execute(createSettings);
+            stmt.execute(createAccounts);
         } catch (SQLException e) {
             throw new RuntimeException("Failed to initialize database", e);
         }

@@ -7,6 +7,7 @@ import javafx.stage.Stage;
 import org.example.financetracker.db.DatabaseManager;
 import org.example.financetracker.db.SettingsDAO;
 import java.io.IOException;
+import org.example.financetracker.db.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -21,14 +22,16 @@ public class HelloApplication extends Application {
         if (isFirstLaunch()) {
             // показ регистрации
             FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("registration-view.fxml"));
-            Scene scene = new Scene(fxmlLoader.load(), 800, 600);
-            stage.setTitle("Finance Tracker - Настройка");
+            Scene scene = new Scene(fxmlLoader.load(), 860, 620);
+            stage.setTitle("FinTrackGo - Настройка");
             stage.setScene(scene);
         } else {
-            // переход сразу на главный экран
-            FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("main-view.fxml"));
-            Scene scene = new Scene(fxmlLoader.load(), 900, 600);
-            stage.setTitle("Finance Tracker");
+            // главный layout с sidebar
+            FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("app-layout.fxml"));
+            Scene scene = new Scene(fxmlLoader.load(), 1100, 680);
+            stage.setTitle("FinTrackGo");
+            stage.setMinWidth(700);
+            stage.setMinHeight(500);
             stage.setScene(scene);
         }
 
@@ -36,7 +39,7 @@ public class HelloApplication extends Application {
     }
 
     private boolean isFirstLaunch() throws SQLException {
-        try (Connection conn = DatabaseManager.getConnection();
+        try (Connection conn = DataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement("SELECT 1 FROM app_settings WHERE id = 1");
              ResultSet rs = stmt.executeQuery()) {
             return !rs.next(); // если записи нет то первый запуск

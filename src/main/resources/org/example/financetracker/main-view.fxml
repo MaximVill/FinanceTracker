@@ -3,65 +3,264 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
-<?import javafx.scene.effect.InnerShadow?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.paint.Color?>
 
-<VBox spacing="10" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.financetracker.ui.MainController">
-    <padding><Insets topRightBottomLeft="20" /></padding>
+<VBox spacing="0"
+      xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="org.example.financetracker.ui.MainController"
+      style="-fx-background-color: #f2f2f7;">
 
-    <!-- верхняя панель с балансом -->
-    <HBox spacing="20">
-        <VBox>
-            <Label fx:id="balanceLabel" style="-fx-font-size: 24; -fx-font-weight: bold;" text="Баланс: 0.00" />
-            <HBox spacing="10">
-                <Label fx:id="incomeLabel" style="-fx-text-fill: green;" text="Доходы: 0.00" />
-                <Label fx:id="expenseLabel" style="-fx-text-fill: red;" text="Расходы: 0.00" />
+    <!-- ═══ TOP BAR ═══ -->
+    <HBox alignment="CENTER_LEFT" spacing="10"
+          style="-fx-background-color: #ffffff; -fx-padding: 10 20 10 20;
+                 -fx-border-color: #e8e8f0; -fx-border-width: 0 0 1 0; -fx-min-height: 54;">
+
+        <Label text="Обзор"
+               style="-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: #1a1a2e;"/>
+
+        <Region HBox.hgrow="ALWAYS"/>
+
+        <!-- Центральный логотип -->
+        <Label text="FINTRACKGO"
+               style="-fx-font-size: 14; -fx-font-weight: bold; -fx-text-fill: #4a56e2"/>
+
+        <Region HBox.hgrow="ALWAYS"/>
+
+        <!-- В копилках -->
+        <Button fx:id="piggyBtn" onAction="#handleShowPiggy"
+                style="-fx-background-color: transparent; -fx-border-color: #e0e0e0; -fx-border-radius: 20;
+                       -fx-background-radius: 20; -fx-padding: 5 12 5 12; -fx-cursor: hand;">
+            <graphic>
+                <HBox spacing="5" alignment="CENTER">
+                    <Label text="🐷" style="-fx-font-size: 13;"/>
+                    <VBox spacing="0">
+                        <Label text="В КОПИЛКАХ" style="-fx-font-size: 9; -fx-text-fill: #9090a8;"/>
+                        <Label fx:id="piggyLabel" text="0,00 ₽"
+                               style="-fx-font-size: 12; -fx-font-weight: bold; -fx-text-fill: #1a1a2e;"/>
+                    </VBox>
+                </HBox>
+            </graphic>
+        </Button>
+
+        <!-- Свободно -->
+        <Button fx:id="freeBtn"
+                style="-fx-background-color: #f0fff4; -fx-border-color: #c3f0d0; -fx-border-radius: 20;
+                       -fx-background-radius: 20; -fx-padding: 5 12 5 12; -fx-cursor: hand;">
+            <graphic>
+                <HBox spacing="5" alignment="CENTER">
+                    <Label text="💳" style="-fx-font-size: 13;"/>
+                    <VBox spacing="0">
+                        <Label text="СВОБОДНО" style="-fx-font-size: 9; -fx-text-fill: #27ae60;"/>
+                        <Label fx:id="freeLabel" text="0,00 ₽"
+                               style="-fx-font-size: 12; -fx-font-weight: bold; -fx-text-fill: #27ae60;"/>
+                    </VBox>
+                </HBox>
+            </graphic>
+        </Button>
+
+        <Button onAction="#handleRefreshRates"
+                style="-fx-background-color: transparent; -fx-text-fill: #9090a8; -fx-font-size: 16;
+                       -fx-cursor: hand; -fx-padding: 4 8; -fx-background-radius: 8;"
+                text="⇄"/>
+        <Button onAction="#handleOpenSettings"
+                style="-fx-background-color: transparent; -fx-text-fill: #9090a8; -fx-font-size: 16;
+                       -fx-cursor: hand; -fx-padding: 4 8; -fx-background-radius: 8;"
+                text="⚙"/>
+    </HBox>
+
+    <!-- ═══ SCROLLABLE CONTENT ═══ -->
+    <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS"
+                style="-fx-background-color: transparent; -fx-background: #f2f2f7;
+                       -fx-border-color: transparent;">
+
+        <VBox spacing="16" style="-fx-padding: 24 28 24 28; -fx-background-color: #f2f2f7;">
+
+            <!-- STATUS LABEL -->
+            <Label fx:id="errorLabel" visible="false" maxWidth="Infinity"
+                   style="-fx-font-size: 13; -fx-padding: 8 14 8 14; -fx-background-radius: 8;"/>
+
+            <!-- ── ВИДЖЕТ: Общий капитал ── -->
+            <HBox spacing="6" alignment="CENTER_LEFT">
+                <Label text="ОБЩИЙ КАПИТАЛ"
+                       style="-fx-font-size: 11; -fx-text-fill: #9090a8"/>
             </HBox>
+            <HBox alignment="CENTER_LEFT" spacing="12">
+                <VBox spacing="2">
+                    <Label fx:id="totalCapitalLabel" text="0 ₽"
+                           style="-fx-font-size: 34; -fx-font-weight: bold; -fx-text-fill: #1a1a2e;"/>
+                    <Label fx:id="monthChangeLabel" text="0%  В ЭТОМ МЕСЯЦЕ"
+                           style="-fx-font-size: 12; -fx-text-fill: #27ae60;"/>
+                </VBox>
+                <Region HBox.hgrow="ALWAYS"/>
+                <!-- иконки управления счетами -->
+                <Button onAction="#handleShowAccounts"
+                        style="-fx-background-color: transparent; -fx-text-fill: #b0b0c0; -fx-font-size: 16; -fx-cursor: hand; -fx-padding: 4 6;"
+                        text="🏛"/>
+                <Button onAction="#handleAddAccount"
+                        style="-fx-background-color: transparent; -fx-text-fill: #b0b0c0; -fx-font-size: 16; -fx-cursor: hand; -fx-padding: 4 6;"
+                        text="⊕"/>
+                <Button onAction="#handleToggleAccounts"
+                        style="-fx-background-color: transparent; -fx-text-fill: #b0b0c0; -fx-font-size: 16; -fx-cursor: hand; -fx-padding: 4 6;"
+                        text="👁"/>
+            </HBox>
+
+            <!-- ── ВИДЖЕТ: Карусель счетов ── -->
+            <StackPane fx:id="accountCarousel" minHeight="140"
+                       style="-fx-background-color: #27ae60; -fx-background-radius: 18;">
+                <!-- Заполняется программно -->
+                <VBox alignment="TOP_LEFT" style="-fx-padding: 22 28 18 28;" spacing="6">
+                    <Label fx:id="accountNameLabel" text="Счёт"
+                           style="-fx-text-fill: rgba(255,255,255,0.85); -fx-font-size: 18; -fx-font-weight: bold;"/>
+                    <Label text="СЧЁТ" style="-fx-text-fill: rgba(255,255,255,0.6); -fx-font-size: 10;"/>
+                    <Label fx:id="accountBalanceLabel" text="0,00 ₽"
+                           style="-fx-text-fill: white; -fx-font-size: 30; -fx-font-weight: bold;"/>
+                    <Label text="доступно" style="-fx-text-fill: rgba(255,255,255,0.7); -fx-font-size: 12;"/>
+                </VBox>
+                <!-- Навигация карусели -->
+                <HBox alignment="BOTTOM_RIGHT" style="-fx-padding: 0 16 16 0;">
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Button onAction="#handlePrevAccount" text="‹"
+                            style="-fx-background-color: rgba(255,255,255,0.25); -fx-text-fill: white;
+                                   -fx-font-size: 16; -fx-background-radius: 50; -fx-padding: 4 10;
+                                   -fx-cursor: hand;"/>
+                    <Button onAction="#handleNextAccount" text="›"
+                            style="-fx-background-color: rgba(255,255,255,0.25); -fx-text-fill: white;
+                                   -fx-font-size: 16; -fx-background-radius: 50; -fx-padding: 4 10;
+                                   -fx-cursor: hand;">
+                        <HBox.margin><Insets left="6"/></HBox.margin>
+                    </Button>
+                </HBox>
+                <!-- Точки-индикаторы -->
+                <HBox fx:id="carouselDots" alignment="BOTTOM_LEFT"
+                      style="-fx-padding: 0 0 18 28;"/>
+            </StackPane>
+
+            <!-- ── ВИДЖЕТ: Заработал / Потратил / Обмен ── -->
+            <HBox spacing="12">
+                <Button onAction="#handleAddIncome" HBox.hgrow="ALWAYS" maxWidth="Infinity"
+                        style="-fx-background-color: #ffffff; -fx-background-radius: 14;
+                               -fx-border-color: #e8e8f0; -fx-border-radius: 14;
+                               -fx-padding: 20 10 16 10; -fx-cursor: hand;">
+                    <graphic>
+                        <VBox alignment="CENTER" spacing="8">
+                            <Label text="↗"
+                                   style="-fx-background-color: #e8f8ef; -fx-background-radius: 10;
+                                          -fx-text-fill: #27ae60; -fx-font-size: 18;
+                                          -fx-padding: 10 14 10 14; -fx-font-weight: bold;"/>
+                            <Label text="ЗАРАБОТАЛ"
+                                   style="-fx-font-size: 11; -fx-text-fill: #9090a8"/>
+                        </VBox>
+                    </graphic>
+                </Button>
+
+                <Button onAction="#handleAddExpense" HBox.hgrow="ALWAYS" maxWidth="Infinity"
+                        style="-fx-background-color: #ffffff; -fx-background-radius: 14;
+                               -fx-border-color: #e8e8f0; -fx-border-radius: 14;
+                               -fx-padding: 20 10 16 10; -fx-cursor: hand;">
+                    <graphic>
+                        <VBox alignment="CENTER" spacing="8">
+                            <Label text="↙"
+                                   style="-fx-background-color: #fdecea; -fx-background-radius: 10;
+                                          -fx-text-fill: #e74c3c; -fx-font-size: 18;
+                                          -fx-padding: 10 14 10 14; -fx-font-weight: bold;"/>
+                            <Label text="ПОТРАТИЛ"
+                                   style="-fx-font-size: 11; -fx-text-fill: #9090a8"/>
+                        </VBox>
+                    </graphic>
+                </Button>
+
+                <Button onAction="#handleExchange" HBox.hgrow="ALWAYS" maxWidth="Infinity"
+                        style="-fx-background-color: #ffffff; -fx-background-radius: 14;
+                               -fx-border-color: #e8e8f0; -fx-border-radius: 14;
+                               -fx-padding: 20 10 16 10; -fx-cursor: hand;">
+                    <graphic>
+                        <VBox alignment="CENTER" spacing="8">
+                            <Label text="⇄"
+                                   style="-fx-background-color: #edeeff; -fx-background-radius: 10;
+                                          -fx-text-fill: #4a56e2; -fx-font-size: 18;
+                                          -fx-padding: 10 14 10 14; -fx-font-weight: bold;"/>
+                            <Label text="ОБМЕН"
+                                   style="-fx-font-size: 11; -fx-text-fill: #9090a8"/>
+                        </VBox>
+                    </graphic>
+                </Button>
+            </HBox>
+
+            <!-- ── НИЖНИЕ ВИДЖЕТЫ: Сводка + Цели ── -->
+            <HBox spacing="14" alignment="TOP_LEFT">
+
+                <!-- Сводка за месяц -->
+                <VBox spacing="10" HBox.hgrow="ALWAYS"
+                      style="-fx-background-color: #ffffff; -fx-background-radius: 14;
+                             -fx-border-color: #e8e8f0; -fx-border-radius: 14; -fx-padding: 18 20 18 20;">
+                    <HBox alignment="CENTER_LEFT">
+                        <Label text="Сводка за месяц"
+                               style="-fx-font-size: 14; -fx-font-weight: bold; -fx-text-fill: #1a1a2e;"/>
+                    </HBox>
+                    <HBox alignment="CENTER_LEFT" spacing="10">
+                        <Label text="⊕" style="-fx-text-fill: #27ae60; -fx-font-size: 16;"/>
+                        <Label text="Доходы" style="-fx-font-size: 13; -fx-text-fill: #4a4a6a;"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Label fx:id="incomeLabel" text="0,00 ₽"
+                               style="-fx-font-size: 13; -fx-font-weight: bold; -fx-text-fill: #1a1a2e;"/>
+                    </HBox>
+                    <HBox alignment="CENTER_LEFT" spacing="10">
+                        <Label text="⊖" style="-fx-text-fill: #e74c3c; -fx-font-size: 16;"/>
+                        <Label text="Расходы" style="-fx-font-size: 13; -fx-text-fill: #4a4a6a;"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Label fx:id="expenseLabel" text="0,00 ₽"
+                               style="-fx-font-size: 13; -fx-font-weight: bold; -fx-text-fill: #1a1a2e;"/>
+                    </HBox>
+                    <!-- Правило 50/30/20 -->
+                    <VBox spacing="4"
+                          style="-fx-background-color: #f4f4fb; -fx-background-radius: 10; -fx-padding: 12 14;">
+                        <Label text="💡 ПРАВИЛО 50/30/20"
+                               style="-fx-font-size: 10; -fx-text-fill: #6c63ff; -fx-font-weight: bold;"/>
+                        <Label text="«Идеальный бюджет: 50% на нужды, 30% на желания, 20% на накопления.»"
+                               wrapText="true"
+                               style="-fx-font-size: 11; -fx-text-fill: #4a4a6a; -fx-font-style: italic;"/>
+                    </VBox>
+                </VBox>
+
+                <!-- Последние транзакции -->
+                <VBox spacing="10" HBox.hgrow="ALWAYS"
+                      style="-fx-background-color: #ffffff; -fx-background-radius: 14;
+                             -fx-border-color: #e8e8f0; -fx-border-radius: 14; -fx-padding: 18 20 18 20;">
+                    <HBox alignment="CENTER_LEFT">
+                        <Label text="Последние транзакции"
+                               style="-fx-font-size: 14; -fx-font-weight: bold; -fx-text-fill: #1a1a2e;"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Label text="ВСЯ ИСТОРИЯ 🕐"
+                               style="-fx-font-size: 10; -fx-text-fill: #9090a8; -fx-cursor: hand;"/>
+                    </HBox>
+                    <VBox fx:id="recentTransactionsBox" spacing="8">
+                        <Label text="Нет транзакций"
+                               style="-fx-text-fill: #c0c0d0; -fx-font-size: 13; -fx-padding: 10 0 10 0;"/>
+                    </VBox>
+                </VBox>
+            </HBox>
+
+            <!-- ── Полная таблица транзакций (скрыта по умолчанию, нужна для логики) ── -->
+            <TableView fx:id="transactionsTable" visible="false" managed="false"
+                       style="-fx-background-color: #ffffff;">
+                <columns>
+                    <TableColumn fx:id="titleColumn"    prefWidth="200" text="Название"/>
+                    <TableColumn fx:id="amountColumn"   prefWidth="110" text="Сумма"/>
+                    <TableColumn fx:id="currencyColumn" prefWidth="75"  text="Валюта"/>
+                    <TableColumn fx:id="categoryColumn" prefWidth="150" text="Категория"/>
+                    <TableColumn fx:id="typeColumn"     prefWidth="90"  text="Тип"/>
+                    <TableColumn fx:id="dateColumn"     prefWidth="105" text="Дата"/>
+                    <TableColumn fx:id="actionsColumn"  prefWidth="160" text="Действия"/>
+                </columns>
+            </TableView>
+
         </VBox>
-        <VBox spacing="5">
-            <Button onAction="#handleRefreshRates" text="🔄 Обновить курсы" />
-        </VBox>
-        <Button onAction="#handleChangeCurrency" text="Сменить валюту" />
-        <Button onAction="#handleClearAll" style="-fx-background-color: #e74c3c; -fx-text-fill: white;" text="Очистить всё" />
-    </HBox>
-
-    <!-- кнопки добавления транзакций -->
-    <HBox alignment="BASELINE_CENTER" prefHeight="86.0" prefWidth="832.0" spacing="20" translateY="9.0">
-        <Button onAction="#handleAddIncome" prefHeight="103.0" prefWidth="278.0" style="-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-font-size: 16; -fx-padding: 15 30;" text="➕ Добавить доход">
-            <effect>
-                <InnerShadow>
-                    <color>
-                        <Color red="0.5400000214576721" green="0.3779999911785126" blue="0.3779999911785126" opacity="0.8723403811454773" />
-                    </color>
-                </InnerShadow>
-            </effect></Button>
-        <Button onAction="#handleAddExpense" prefHeight="103.0" prefWidth="278.0" style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-size: 16; -fx-padding: 15 30;" text="➖ Добавить расход">
-            <effect>
-                <InnerShadow>
-                    <color>
-                        <Color red="0.5400000214576721" green="0.3779999911785126" blue="0.3779999911785126" opacity="0.8723403811454773" />
-                    </color>
-                </InnerShadow>
-            </effect></Button>
-    </HBox>
-
-    <!-- сообщение об ошибке -->
-    <Label fx:id="errorLabel" style="-fx-text-fill: red; -fx-font-weight: bold;" visible="false" />
-
-    <!-- таблица транзакций -->
-    <TableView fx:id="transactionsTable" prefWidth="832.0" VBox.vgrow="ALWAYS">
-        <columns>
-            <TableColumn fx:id="titleColumn" prefWidth="200" text="Название" />
-            <TableColumn fx:id="amountColumn" prefWidth="100" text="Сумма" />
-            <TableColumn fx:id="currencyColumn" prefWidth="80" text="Валюта" />
-            <TableColumn fx:id="categoryColumn" prefWidth="150" text="Категория" />
-            <TableColumn fx:id="typeColumn" prefWidth="80" text="Тип" />
-            <TableColumn fx:id="dateColumn" prefWidth="100" text="Дата" />
-            <TableColumn fx:id="actionsColumn" prefWidth="120" text="Действия" />
-        </columns>
-    </TableView>
+    </ScrollPane>
 </VBox>

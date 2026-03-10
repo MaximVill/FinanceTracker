@@ -44,11 +44,14 @@ public class RegistrationController {
 
         try {
             SettingsDAO settingsDAO = new SettingsDAO();
+            // Сначала создаём запись настроек (если нет), затем обновляем поля
+            settingsDAO.createDefaultSettings();
             settingsDAO.setMainCurrency(mainCurrency);
             String name = nameField.getText().trim();
             if (!name.isEmpty()) {
                 settingsDAO.setUserName(name);
             }
+            settingsDAO.setFirstLaunchComplete();
             log.info("Профиль настроен: имя={}, валюта={}", name, mainCurrency);
 
             // Переход на главный экран
@@ -61,11 +64,13 @@ public class RegistrationController {
 
     private void switchToMainScreen() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/financetracker/main-view.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/financetracker/app-layout.fxml"));
             Parent root = loader.load();
             Stage stage = (Stage) submitButton.getScene().getWindow();
-            stage.setScene(new Scene(root, 900, 600));
-            stage.setTitle("Finance Tracker");
+            stage.setScene(new Scene(root, 1100, 680));
+            stage.setTitle("FinTrackGo");
+            stage.setMinWidth(700);
+            stage.setMinHeight(500);
             stage.centerOnScreen();
         } catch (IOException e) {
             log.error("Ошибка загрузки главного экрана", e);

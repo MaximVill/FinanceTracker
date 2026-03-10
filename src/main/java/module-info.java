@@ -4,6 +4,7 @@ module org.example.financetracker {
     requires java.sql;
     requires com.h2database;
     requires org.slf4j;
+    requires ch.qos.logback.classic;
     requires java.net.http;
     requires com.fasterxml.jackson.databind;
 

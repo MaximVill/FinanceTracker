@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="org.example.financetracker.ui.SummaryController"
+      style="-fx-background-color: #f4f4fb;"
+      VBox.vgrow="ALWAYS">
+
+    <!-- Таб-бар -->
+    <HBox fx:id="tabBar" spacing="4"
+          style="-fx-background-color: white; -fx-padding: 12 24; -fx-border-color: #e8e8f0; -fx-border-width: 0 0 1 0;">
+    </HBox>
+
+    <!-- Контент выбранной вкладки -->
+    <StackPane fx:id="contentPane" VBox.vgrow="ALWAYS"
+               style="-fx-background-color: #f4f4fb;"/>
+
+</VBox>
