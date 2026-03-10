@@ -61,7 +61,7 @@ public class MainController {
     private void initServices() throws SQLException {
         settingsDAO = new SettingsDAO();
         transactionService = new TransactionService();
-        exchangeRateService = new ExchangeRateService(new ExchangeRateDAO(DatabaseManager.getConnection()));
+        exchangeRateService = new ExchangeRateService(new ExchangeRateDAO());
         categoryDAO = new CategoryDAO();
     }
 
@@ -399,12 +399,7 @@ public class MainController {
     }
 
     private void saveTransaction(Transaction transaction) {
-        try {
-            transactionService.deleteTransaction(transaction.getId());
-            transactionService.addTransaction(transaction);
-        } catch (Exception e) {
-            throw new RuntimeException("Не удалось обновить транзакцию", e);
-        }
+        transactionService.updateTransaction(transaction);
     }
 
     @FXML
@@ -498,6 +493,7 @@ public class MainController {
 
     private void showError(String message) {
         Platform.runLater(() -> {
+            errorLabel.setStyle("-fx-text-fill: #e74c3c; -fx-font-weight: bold;");
             errorLabel.setText("⚠️ " + message);
             errorLabel.setVisible(true);
         });
@@ -511,11 +507,15 @@ public class MainController {
 
     private void showNotification(String message) {
         Platform.runLater(() -> {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Уведомление");
-            alert.setHeaderText(null);
-            alert.setContentText(message);
-            alert.showAndWait();
+            errorLabel.setStyle("-fx-text-fill: #27ae60; -fx-font-weight: bold;");
+            errorLabel.setText("✅ " + message);
+            errorLabel.setVisible(true);
         });
+        new Thread(() -> {
+            try {
+                Thread.sleep(3000);
+                Platform.runLater(() -> errorLabel.setVisible(false));
+            } catch (InterruptedException ignored) {}
+        }).start();
     }
 }

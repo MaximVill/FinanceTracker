@@ -11,6 +11,35 @@ import java.sql.SQLException;
 public class SettingsDAO {
     private static final Logger log = LoggerFactory.getLogger(SettingsDAO.class);
 
+    // Получить имя пользователя
+    public String getUserName() {
+        String sql = "SELECT user_name FROM app_settings WHERE id = 1";
+        try (Connection conn = DataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                String name = rs.getString("user_name");
+                return name != null ? name : "";
+            }
+        } catch (SQLException e) {
+            log.error("Ошибка чтения имени пользователя", e);
+        }
+        return "";
+    }
+
+    // Сохранить имя пользователя
+    public void setUserName(String name) {
+        String sql = "MERGE INTO app_settings (id, user_name) KEY (id) VALUES (1, ?)";
+        try (Connection conn = DataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, name != null ? name.trim() : "");
+            stmt.executeUpdate();
+            log.info("Имя пользователя сохранено: {}", name);
+        } catch (SQLException e) {
+            log.error("Ошибка сохранения имени пользователя", e);
+        }
+    }
+
     // Получить основную валюту
     public String getMainCurrency() {
         String sql = "SELECT main_currency FROM app_settings WHERE id = 1";

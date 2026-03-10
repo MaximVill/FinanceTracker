@@ -13,8 +13,8 @@ import org.slf4j.LoggerFactory;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-import java.sql.SQLException;
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.sql.Statement;
 
 import java.util.HashMap;
@@ -28,9 +28,9 @@ public class TransactionService {
     private final ExchangeRateService exchangeRateService;
     private final SettingsDAO settingsDAO;
 
-    public TransactionService() throws SQLException {
+    public TransactionService() {
         this.transactionDAO = new TransactionDAO();
-        this.exchangeRateService = new ExchangeRateService(new ExchangeRateDAO(DatabaseManager.getConnection()));
+        this.exchangeRateService = new ExchangeRateService(new ExchangeRateDAO());
         this.settingsDAO = new SettingsDAO();
     }
 
@@ -38,6 +38,12 @@ public class TransactionService {
     public void addTransaction(Transaction transaction) {
         transactionDAO.add(transaction);
         log.info("Транзакция добавлена через сервис: {}", transaction.getTitle());
+    }
+
+    // Обновление транзакции (без изменения id)
+    public void updateTransaction(Transaction transaction) {
+        transactionDAO.update(transaction);
+        log.info("Транзакция обновлена через сервис: id={}, {}", transaction.getId(), transaction.getTitle());
     }
 
     // Удаление транзакции

@@ -44,8 +44,12 @@ public class RegistrationController {
 
         try {
             SettingsDAO settingsDAO = new SettingsDAO();
-            settingsDAO.setMainCurrency(mainCurrency); // это создаст запись в app_settings
-            log.info("Профиль настроен: валюта={}", mainCurrency);
+            settingsDAO.setMainCurrency(mainCurrency);
+            String name = nameField.getText().trim();
+            if (!name.isEmpty()) {
+                settingsDAO.setUserName(name);
+            }
+            log.info("Профиль настроен: имя={}, валюта={}", name, mainCurrency);
 
             // Переход на главный экран
             switchToMainScreen();

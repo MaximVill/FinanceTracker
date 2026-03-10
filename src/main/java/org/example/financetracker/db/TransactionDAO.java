@@ -42,6 +42,32 @@ public class TransactionDAO {
         }
     }
 
+    // 4. Обновление существующей транзакции
+    public void update(Transaction t) {
+        String sql = "UPDATE transactions SET title = ?, amount = ?, currency = ?, " +
+                     "transaction_date = ?, category_id = ? WHERE id = ?";
+        try (Connection conn = DataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, t.getTitle());
+            stmt.setBigDecimal(2, t.getAmount());
+            stmt.setString(3, t.getCurrency());
+            stmt.setDate(4, Date.valueOf(t.getTransaction_date()));
+            stmt.setLong(5, t.getCategory_id());
+            stmt.setLong(6, t.getId());
+
+            int affected = stmt.executeUpdate();
+            if (affected > 0) {
+                log.info("Обновлена транзакция id={}: {} {} {}", t.getId(), t.getAmount(), t.getCurrency(), t.getTitle());
+            } else {
+                log.warn("Транзакция id={} не найдена для обновления", t.getId());
+            }
+        } catch (SQLException e) {
+            log.error("Ошибка при обновлении транзакции id={}", t.getId(), e);
+            throw new RuntimeException("Failed to update transaction", e);
+        }
+    }
+
     // 2. Удаление по id
     public void delete(long id) {
         String sql = "DELETE FROM transactions WHERE id = ?";

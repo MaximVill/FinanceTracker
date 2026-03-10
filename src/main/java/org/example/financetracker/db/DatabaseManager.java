@@ -67,6 +67,7 @@ public class DatabaseManager {
         String createSettings = """
             CREATE TABLE IF NOT EXISTS app_settings (
                 id INT PRIMARY KEY,
+                user_name VARCHAR(50) DEFAULT '',
                 main_currency VARCHAR(3) NOT NULL DEFAULT 'RUB',
                 first_launch BOOLEAN DEFAULT TRUE
             );
